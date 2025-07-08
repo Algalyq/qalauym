@@ -1,0 +1,48 @@
+{
+  "auth": {
+    "login": "Вход",
+    "register": "Регистрация",
+    "email": "Электронная почта",
+    "username": "Имя пользователя",
+    "password": "Пароль",
+    "confirmPassword": "Подтверждение пароля",
+    "birthday": "Дата рождения",
+    "gender": "Пол",
+    "male": "Мужской",
+    "female": "Женский",
+    "loginButton": "Войти",
+    "registerButton": "Зарегистрироваться",
+    "loggingIn": "Вход...",
+    "creatingAccount": "Создание аккаунта...",
+    "dontHaveAccount": "Нет аккаунта?",
+    "registerHere": "Зарегистрируйтесь здесь",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
+    "loginHere": "Войдите здесь",
+    "orLoginWith": "или войти через",
+    "orRegisterWith": "или зарегистрироваться через",
+    "errors": {
+      "fillAllFields": "Пожалуйста, заполните все поля",
+      "passwordsDoNotMatch": "Пароли не совпадают",
+      "failedToLogin": "Не удалось войти. Проверьте учетные данные.",
+      "failedToRegister": "Не удалось создать аккаунт."
+    }
+  },
+  "dashboard": {
+    "welcome": "Добро пожаловать!",
+    "logout": "Выход",
+    "addNewWish": "Добавить новое желание",
+    "giftName": "Название подарка",
+    "description": "Описание",
+    "url": "Ссылка (необязательно)",
+    "whatWouldYouLike": "Что бы вы хотели?",
+    "addDetails": "Добавьте подробности об этом подарке",
+    "linkPlaceholder": "Ссылка на подарок (если есть)",
+    "addToWishlist": "Добавить в список желаний",
+    "cancel": "Отмена",
+    "myWishlist": "Мой список желаний",
+    "emptyWishlist": "Ваш список желаний пуст. Добавьте желания!",
+    "delete": "Удалить",
+    "viewItem": "Посмотреть",
+    "added": "Добавлено"
+  }
+}

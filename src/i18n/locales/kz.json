@@ -1,0 +1,48 @@
+{
+  "auth": {
+    "login": "Кіру",
+    "register": "Тіркелу",
+    "email": "Электрондық пошта",
+    "username": "Пайдаланушы аты",
+    "password": "Құпия сөз",
+    "confirmPassword": "Құпия сөзді растау",
+    "birthday": "Туған күні",
+    "gender": "Жынысы",
+    "male": "Ер",
+    "female": "Әйел",
+    "loginButton": "Кіру",
+    "registerButton": "Тіркелу",
+    "loggingIn": "Кіру...",
+    "creatingAccount": "Тіркелу...",
+    "dontHaveAccount": "Тіркелгіңіз жоқ па?",
+    "registerHere": "Мұнда тіркеліңіз",
+    "alreadyHaveAccount": "Тіркелгіңіз бар ма?",
+    "loginHere": "Мұнда кіріңіз",
+    "orLoginWith": "немесе арқылы кіру",
+    "orRegisterWith": "немесе арқылы тіркелу",
+    "errors": {
+      "fillAllFields": "Барлық өрістерді толтырыңыз",
+      "passwordsDoNotMatch": "Құпия сөздер сәйкес келмейді",
+      "failedToLogin": "Кіру сәтсіз аяқталды. Тіркелгі деректерін тексеріңіз.",
+      "failedToRegister": "Тіркелу сәтсіз аяқталды."
+    }
+  },
+  "dashboard": {
+    "welcome": "Қош келдіңіз!",
+    "logout": "Шығу",
+    "addNewWish": "Жаңа тілек қосу",
+    "giftName": "Сыйлық атауы",
+    "description": "Сипаттама",
+    "url": "Сілтеме (міндетті емес)",
+    "whatWouldYouLike": "Сіз не қалайсыз?",
+    "addDetails": "Осы сыйлық туралы толық мәліметтер қосыңыз",
+    "linkPlaceholder": "Сыйлыққа сілтеме (егер бар болса)",
+    "addToWishlist": "Тілектер тізіміне қосу",
+    "cancel": "Болдырмау",
+    "myWishlist": "Менің тілектерім",
+    "emptyWishlist": "Тілектер тізімі бос. Тілектер қосыңыз!",
+    "delete": "Жою",
+    "viewItem": "Затты қарау",
+    "added": "Қосылған"
+  }
+}
