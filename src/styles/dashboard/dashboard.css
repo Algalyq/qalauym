@@ -62,12 +62,11 @@
   background-color: #f5ff00;
   color: #000;
   padding: 16px 24px;
-  border-radius: 50px;
+  border-radius: 12px;
   border: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   font-weight: 500;
-  transition: all 0.2s ease;
-  cursor: pointer;
+  flex-direction: column;
+  width: 100%;
 }
 
 .add-wish-button:hover {
@@ -101,7 +100,7 @@
   font-weight: 500;
 }
 
-.form-input {
+.form-input-dash {
   width: 100%;
   padding: 10px 16px;
   border: 1px solid #D1D5DB;
@@ -111,7 +110,7 @@
   transition: all 0.2s;
 }
 
-.form-input:focus {
+.form-input-dash:focus {
   outline: none;
   border-color: #093FB4;
   box-shadow: 0 0 0 2px rgba(9, 63, 180, 0.15);
