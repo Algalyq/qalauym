@@ -70,6 +70,7 @@ const WishlistDetails = () => {
     if (!newWish.title.trim()) return;
     
     try {
+      console.log(currentUser.token);
       const createdWish = await wishlistService.addWishToWishlist(newWish, currentUser.token);
       
       // Add the new wish to the list

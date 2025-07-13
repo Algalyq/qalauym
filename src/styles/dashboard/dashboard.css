@@ -10,7 +10,7 @@
 
 /* Header */
 .dashboard-header {
-  background-color: #f5ff00;
+  /* background-color: #DCFB01; */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -46,12 +46,15 @@
 .page-title {
   font-size: 28px;
   font-weight: 700;
+  padding-left: 24px;
   margin-bottom: 32px;
   font-family: var(--font-heading);
 }
 
 .section {
   margin-bottom: 32px;
+  display: flex;
+  justify-content: center;
 }
 
 /* Add Wish Button */
@@ -59,14 +62,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background-color: #f5ff00;
-  color: #000;
   padding: 16px 24px;
   border-radius: 12px;
-  border: none;
+  border-color: rgb(147 197 253);
+  background-color: rgb(239 246 255);
+  border-width: 1px;
+  border-style: solid;
   font-weight: 500;
   flex-direction: column;
-  width: 100%;
+  width: 80%;
+}
+
+.add-wish-button-text{
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 16px;
 }
 
 .add-wish-button:hover {

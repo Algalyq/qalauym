@@ -190,7 +190,7 @@
   background-color: var(--color-background-hover);
 }
 
-.add-wish-button {
+/* .add-wish-button {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -205,12 +205,12 @@
   font-weight: 500;
   cursor: pointer;
   transition: border-color 0.2s, color 0.2s;
-}
+} */
 
-.add-wish-button:hover {
+/* .add-wish-button:hover {
   border-color: var(--color-primary);
   color: var(--color-primary-hover);
-}
+} */
 
 .gifts-section {
   margin-top: 30px;

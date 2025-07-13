@@ -16,7 +16,8 @@ export function AuthProvider({ children }) {
       // Store user data in localStorage
       const user = { username, ...response };
       localStorage.setItem('user', JSON.stringify(user));
-      localStorage.setItem('token', response.token || response.accessToken || '');
+      console.log(user);
+      localStorage.setItem('token', response.data.accessToken);
       setCurrentUser(user);
       return user;
     } catch (error) {

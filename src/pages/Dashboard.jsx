@@ -6,6 +6,8 @@ import '../styles/dashboard/dashboard.css';
 import LanguageSelector from '../components/common/LanguageSelector';
 import wishlistService from '../services/wishlistService';
 import logo from '../assets/images/logo_q.jpg';
+import { FaCirclePlus } from "react-icons/fa6";
+
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -72,11 +74,10 @@ const Dashboard = () => {
     e.preventDefault();
     
     if (!newWishlist.title.trim()) return;
-    
     try {
       const createdWishlist = await wishlistService.createWishlist(
         newWishlist,
-        currentUser.token
+        currentUser.data.accessToken
       );
       
       // Add the new wishlist to the list
@@ -251,11 +252,8 @@ const Dashboard = () => {
               onClick={() => setIsCreatingWishlist(true)} 
               className="add-wish-button"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              <span>{t('dashboard.createNewWishlist')}</span>
+              <FaCirclePlus size={24} color='rgb(59 130 246'/>
+              <span className='add-wish-button-text'>{t('dashboard.createNewWishlist')}</span>
             </button>
           )}
         </section>
