@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'http://13.48.172.63:8080', // 'http://13.48.172.63:8080',
+  baseURL: 'https://13.48.172.63:8443', // Changed from HTTP to HTTPS to prevent Mixed Content errors
   headers: {
     'Content-Type': 'application/json',
     'Accept': '*/*'
