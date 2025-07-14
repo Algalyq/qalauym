@@ -7,18 +7,18 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.js',
   },
-  server: {
-    proxy: {
-      '/auth': {
-        target: 'https://api.qalauym.kz',
-        changeOrigin: true,
-        secure: false,  // Игнорировать валидацию SSL
-      },
-      '/api': {
-        target: 'https://api.qalauym.kz',
-        changeOrigin: true,
-        secure: false,  // Игнорировать валидацию SSL
-      }
-    }
-  }
+  // server: {
+  //   proxy: {
+  //     '/auth': {
+  //       target: 'https://api.qalauym.kz',
+  //       changeOrigin: true,
+  //       secure: false,  // Игнорировать валидацию SSL
+  //     },
+  //     '/api': {
+  //       target: 'https://api.qalauym.kz',
+  //       changeOrigin: true,
+  //       secure: false,  // Игнорировать валидацию SSL
+  //     }
+  //   }
+  // }
 })
