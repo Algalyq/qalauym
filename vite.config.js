@@ -7,4 +7,20 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.js',
   },
+  server: {
+    proxy: {
+      '/auth': {
+        target: 'https://13.48.172.63:8443',
+        changeOrigin: true,
+        secure: false,  // Ignore SSL certificate validation
+        rewrite: (path) => path
+      },
+      '/api': {
+        target: 'https://13.48.172.63:8443',
+        changeOrigin: true,
+        secure: false,  // Ignore SSL certificate validation
+        rewrite: (path) => path
+      }
+    }
+  }
 })
