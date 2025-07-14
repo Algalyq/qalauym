@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: '/auth', // Using Vite proxy to avoid CORS and SSL certificate issues
+  baseURL: '', // Using Vite proxy to avoid CORS and SSL certificate issues
   headers: {
     'Content-Type': 'application/json',
     'Accept': '*/*'
@@ -14,7 +14,7 @@ export const authService = {
   // Login function
   login: async (username, password) => {
     try {
-      const response = await api.post('/login', {
+      const response = await api.post('/auth/login', {
         username,
         password
       });
