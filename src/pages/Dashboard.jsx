@@ -7,6 +7,8 @@ import LanguageSelector from '../components/common/LanguageSelector';
 import wishlistService from '../services/wishlistService';
 import logo from '../assets/images/logo_q.jpg';
 import { FaCirclePlus } from "react-icons/fa6";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 
 const Dashboard = () => {
@@ -29,12 +31,13 @@ const Dashboard = () => {
   // Load wishlists from the API when component mounts
   useEffect(() => {
     const fetchWishlists = async () => {
-      if (!currentUser || !currentUser.token) return;
+      if (!currentUser || !currentUser.data.accessToken) return;
       
       try {
         setIsLoading(true);
-        const data = await wishlistService.getUserWishlists(currentUser.token);
-        setWishlists(data);
+        const data = await wishlistService.getUserWishlists(currentUser.data.accessToken);
+        console.log("Wishlists:", data);
+        setWishlists(data.data);
         setError(null);
       } catch (err) {
         console.error('Failed to fetch wishlists:', err);
@@ -87,8 +90,21 @@ const Dashboard = () => {
       setNewWishlist({ title: '', description: '', visibility: 'PUBLIC' });
       setIsCreatingWishlist(false);
       
-      // Navigate to the wishlist details page
-      navigate(`/wishlist/${createdWishlist.id}`);
+      console.log("Wish list id:", createdWishlist.data.id)
+
+      // Show success notification
+      // toast.success(t('Wishlist created successfully!'));
+      
+      // Store the newly created wishlist in localStorage to ensure it's available
+      // even before the API has fully processed it
+      if (createdWishlist.data) {
+        localStorage.setItem('recentWishlist', JSON.stringify(createdWishlist.data));
+      }
+      
+      // Delay navigation slightly to allow toast to be visible
+      setTimeout(() => {
+        navigate(`/wishlist/${createdWishlist.data.id}`);
+      }, 1200);
     } catch (err) {
       console.error('Failed to create wishlist:', err);
       setError(t('dashboard.failedToCreateWishlist'));
@@ -105,6 +121,17 @@ const Dashboard = () => {
   
   return (
     <div className="dashboard">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+      />
       {/* Side Menu */}
       {isMenuOpen && (
         <div className="side-menu" ref={menuRef}>
@@ -181,7 +208,7 @@ const Dashboard = () => {
         
         {error && <div className="error-message">{error}</div>}
         
-        <section className="section">
+        <section className="section-dashboard">
           {isCreatingWishlist ? (
             <div className="card">
               <h2 className="card-title">{t('dashboard.createNewWishlist')}</h2>
@@ -258,7 +285,7 @@ const Dashboard = () => {
           )}
         </section>
         
-        <section>
+        <section className="wishlist-section">
           {isLoading ? (
             <div className="loading">
               <p>{t('dashboard.loadingWishlists')}</p>
@@ -273,8 +300,8 @@ const Dashboard = () => {
                 <div key={wishlist.id} className="wishlist-item" onClick={() => handleNavigateToWishlist(wishlist.id)}>
                   <div className="item-header">
                     <h3 className="item-title">{wishlist.title}</h3>
-                    <span className={`visibility-badge ${wishlist.visibility.toLowerCase()}`}>
-                      {wishlist.visibility === 'PUBLIC' ? t('dashboard.public') : t('dashboard.private')}
+                    <span className={`visibility-badge ${wishlist.visibility ? wishlist.visibility.toLowerCase() : 'public'}`}>
+                      {wishlist.visibility === 'PUBLIC' || !wishlist.visibility ? t('dashboard.public') : t('dashboard.private')}
                     </span>
                   </div>
                   

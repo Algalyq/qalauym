@@ -51,7 +51,7 @@
   font-family: var(--font-heading);
 }
 
-.section {
+.section-dashboard {
   margin-bottom: 32px;
   display: flex;
   justify-content: center;
@@ -139,7 +139,6 @@
 
 .btn-primary {
   background-color: #093FB4;
-  color: #fff;
   padding: 10px 16px;
   border-radius: 6px;
   font-weight: 500;
@@ -149,9 +148,8 @@
 }
 
 .btn-primary:hover {
-  background-color: rgba(9, 63, 180, 0.9);
   transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(9, 63, 180, 0.2);
+  /* box-shadow: 0 4px 6px -1px rgba(9, 63, 180, 0.2); */
 }
 
 .btn-secondary {
@@ -182,9 +180,17 @@
   font-weight: 500;
 }
 
+.wishlist-section {
+  display: flex;
+  justify-content: center;
+}
+
 .wishlist-grid {
-  display: grid;
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 90%;
+  justify-content: center;
 }
 
 .wishlist-item {

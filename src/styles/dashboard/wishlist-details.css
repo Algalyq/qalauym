@@ -2,27 +2,22 @@
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
 }
 
 .header {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   background-color: var(--color-background-light);
   border-bottom: 1px solid var(--color-border);
-  padding: 15px 0;
-  margin-bottom: 30px;
   position: sticky;
   top: 0;
-  z-index: 100;
 }
 
 .header-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
 }
 
 .back-button {
@@ -33,7 +28,7 @@
   align-items: center;
   justify-content: center;
   color: var(--color-text);
-  padding: 8px;
+  /* padding: 8px; */
   border-radius: 50%;
   transition: background-color 0.2s;
 }
@@ -57,14 +52,13 @@
 }
 
 .main-content {
-  padding: 20px 0;
+  padding: 0 0;
 }
 
 .wishlist-info {
   background-color: var(--color-background-light);
   border-radius: 8px;
   padding: 20px;
-  margin-bottom: 30px;
 }
 
 .visibility-badge {
@@ -100,8 +94,10 @@
   margin: 10px 0 0 0;
 }
 
-.section {
-  margin-bottom: 30px;
+.section-wishlist {
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: center;
 }
 
 .card {
@@ -171,7 +167,6 @@
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-hover);
 }
 
 .btn-secondary {
@@ -190,30 +185,9 @@
   background-color: var(--color-background-hover);
 }
 
-/* .add-wish-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background-color: var(--color-background-light);
-  color: var(--color-primary);
-  border: 2px dashed var(--color-border);
-  border-radius: 8px;
-  padding: 15px;
-  width: 100%;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
-} */
-
-/* .add-wish-button:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary-hover);
-} */
 
 .gifts-section {
-  margin-top: 30px;
+  padding: 0px 24px;
 }
 
 .section-title {
@@ -330,6 +304,10 @@
 @media (max-width: 768px) {
   .wishlist-title {
     font-size: 1.4rem;
+  }
+
+  .header{
+    padding: 16px 32px;
   }
   
   .gifts-grid {

@@ -16,6 +16,7 @@ const WishlistDetails = () => {
   const [wishes, setWishes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showRetry, setShowRetry] = useState(false);
   
   const [newWish, setNewWish] = useState({
     wishListId: id,
@@ -29,20 +30,37 @@ const WishlistDetails = () => {
   // Fetch wishlist details and wishes
   useEffect(() => {
     const fetchData = async () => {
-      if (!currentUser || !currentUser.token) {
+      if (!currentUser || !currentUser.data.accessToken) {
         navigate('/auth');
         return;
       }
       
       try {
         setIsLoading(true);
-        // Fetch wishlist details
-        const wishlistData = await wishlistService.getWishlistById(id, currentUser.token);
-        setWishlist(wishlistData);
         
-        // Fetch wishes for this wishlist
-        const wishesData = await wishlistService.getWishesForWishlist(id, currentUser.token);
-        setWishes(wishesData);
+        // First, fetch wishlist metadata (we'll need to add this API endpoint)
+        try {
+          // If you have a separate endpoint for wishlist details, uncomment below
+          const wishlistMetadata = await wishlistService.getWishlistMetadata(id, currentUser.data.accessToken);
+          console.log("Wishlist metadata:", wishlistMetadata.data)
+          setWishlist(wishlistMetadata.data);
+          
+        } catch (metadataErr) {
+          console.error('Error fetching wishlist metadata:', metadataErr);
+          // Continue execution to fetch wishes
+        }
+        
+        // Fetch wishes for the wishlist
+        const wishesData = await wishlistService.getWishlistById(id, currentUser.data.accessToken);
+        
+        // Check if the response has the expected structure
+        if (wishesData && wishesData.data) {
+          console.log('Wishes data:', wishesData.data);
+          setWishes(wishesData.data); // This now correctly contains the array of wishes
+        } else {
+          // If no wishes in response, set empty array
+          setWishes([]);
+        }
         
         setError(null);
       } catch (err) {
@@ -70,12 +88,13 @@ const WishlistDetails = () => {
     if (!newWish.title.trim()) return;
     
     try {
-      console.log(currentUser.token);
-      const createdWish = await wishlistService.addWishToWishlist(newWish, currentUser.token);
+      const createdWish = await wishlistService.addWishToWishlist(newWish, currentUser.data.accessToken);
       
       // Add the new wish to the list
-      setWishes(prev => [createdWish, ...prev]);
-      
+      if (createdWish && createdWish.data) {
+        setWishes(prevWishes => [...prevWishes, createdWish.data]);
+      }
+
       // Reset the form
       setNewWish({
         wishListId: id,
@@ -85,6 +104,12 @@ const WishlistDetails = () => {
         imageUrl: ''
       });
       setIsAddingWish(false);
+      
+      // Refresh the wish list after adding a new wish
+      const refreshedWishesData = await wishlistService.getWishlistById(id, currentUser.data.accessToken);
+      if (refreshedWishesData && refreshedWishesData.data) {
+        setWishes(refreshedWishesData.data);
+      }
     } catch (err) {
       console.error('Failed to add wish:', err);
       setError(t('wishlist.failedToAddWish'));
@@ -95,10 +120,32 @@ const WishlistDetails = () => {
     navigate('/dashboard');
   };
   
+  // Add useEffect to show retry button after 2 seconds of loading
+  useEffect(() => {
+    // If still loading after 2 seconds, show retry button
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        setShowRetry(true);
+      }
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+  
+  const handleRetry = () => {
+    window.location.reload();
+  };
+  
+  // Conditional rendering based on component state
   if (isLoading) {
     return (
       <div className="loading-container">
         <p>{t('wishlist.loading')}</p>
+        {showRetry && (
+          <button onClick={handleRetry} className="btn-primary">
+            {t('wishlist.retry')}
+          </button>
+        )}
       </div>
     );
   }
@@ -127,8 +174,8 @@ const WishlistDetails = () => {
 
   return (
     <div className="wishlist-details-container">
-      <header className="header">
-        <div className="header-content">
+      <header className="dashboard-header">
+        <div className="header-container">
           <button onClick={handleGoBack} className="back-button">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M19 12H5M12 19l-7-7 7-7"></path>
@@ -154,7 +201,7 @@ const WishlistDetails = () => {
           </p>
         </div>
         
-        <section className="section">
+        <section className="section-wishlist">
           {isAddingWish ? (
             <div className="card">
               <h2 className="card-title">{t('wishlist.addNewGift')}</h2>

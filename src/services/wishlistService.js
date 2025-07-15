@@ -34,7 +34,7 @@ export const wishlistService = {
   // Get a specific wishlist by ID
   getWishlistById: async (wishlistId, token) => {
     try {
-      const response = await api.get(`/wishlists/${wishlistId}`, {
+      const response = await api.get(`/wishes/list/${wishlistId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -61,20 +61,20 @@ export const wishlistService = {
     }
   },
 
-  // Get all wishes for a specific wishlist
-  getWishesForWishlist: async (wishlistId, token) => {
+  getWishlistMetadata: async (wishlistId, token) => {
     try {
-      const response = await api.get(`/wishes?wishListId=${wishlistId}`, {
+      const response = await api.get(`/wishlists/${wishlistId}`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
       return response.data;
     } catch (error) {
-      console.error('Get wishes error:', error);
+      console.error('Get wishlist metadata error:', error);
       throw error;
     }
-  }
+  },
+
 };
 
 export default wishlistService;
