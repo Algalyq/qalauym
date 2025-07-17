@@ -93,7 +93,7 @@ const Dashboard = () => {
       console.log("Wish list id:", createdWishlist.data.id)
 
       // Show success notification
-      // toast.success(t('Wishlist created successfully!'));
+      toast.success(t('dashboard.wishlistCreatedSuccessfully'));
       
       // Store the newly created wishlist in localStorage to ensure it's available
       // even before the API has fully processed it
@@ -104,7 +104,7 @@ const Dashboard = () => {
       // Delay navigation slightly to allow toast to be visible
       setTimeout(() => {
         navigate(`/wishlist/${createdWishlist.data.id}`);
-      }, 1200);
+      }, 2000);
     } catch (err) {
       console.error('Failed to create wishlist:', err);
       setError(t('dashboard.failedToCreateWishlist'));

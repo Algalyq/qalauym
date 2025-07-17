@@ -75,6 +75,17 @@ export const wishlistService = {
     }
   },
 
+  // Get a shared wishlist by ID (no authentication required)
+  getSharedWishlist: async (wishlistId) => {
+    try {
+      const response = await api.get(`/wishlists/share/${wishlistId}`);
+      return response.data;
+    } catch (error) {
+      console.error('Get shared wishlist error:', error);
+      throw error;
+    }
+  },
+
 };
 
 export default wishlistService;

@@ -4,7 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import wishlistService from '../services/wishlistService';
 import LanguageSelector from '../components/common/LanguageSelector';
+import Toast from '../components/common/Toast';
+import { MdShare } from 'react-icons/md';
 import '../styles/dashboard/wishlist-details.css'; // We'll create this CSS file next
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const WishlistDetails = () => {
   const { t } = useTranslation();
@@ -17,6 +22,8 @@ const WishlistDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showRetry, setShowRetry] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
   
   const [newWish, setNewWish] = useState({
     wishListId: id,
@@ -120,6 +127,27 @@ const WishlistDetails = () => {
     navigate('/dashboard');
   };
   
+  const handleShareWishlist = () => {
+    // Generate the shareable link for the wishlist
+
+    const shareableLink = `${window.location.origin}/shared/wishlist/${id}`;
+    
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareableLink)
+      .then(() => {
+        toast.success(t('wishlist.linkCopied') || 'Link copied to clipboard!');
+      })
+      .catch((err) => {
+        console.error('Failed to copy link:', err);
+        toast.error(t('wishlist.copyFailed') || 'Failed to copy link');
+
+      });
+  };
+  
+  const handleCloseToast = () => {
+    setShowToast(false);
+  };
+  
   // Add useEffect to show retry button after 2 seconds of loading
   useEffect(() => {
     // If still loading after 2 seconds, show retry button
@@ -174,6 +202,17 @@ const WishlistDetails = () => {
 
   return (
     <div className="wishlist-details-container">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+      />
       <header className="dashboard-header">
         <div className="header-container">
           <button onClick={handleGoBack} className="back-button">
@@ -190,9 +229,26 @@ const WishlistDetails = () => {
       
       <main className="main-content">
         <div className="wishlist-info">
-          <span className={`visibility-badge ${wishlist.visibility.toLowerCase()}`}>
-            {wishlist.visibility === 'PUBLIC' ? t('wishlist.public') : t('wishlist.private')}
-          </span>
+          <div className="wishlist-header-actions">
+            <span className={`visibility-badge ${wishlist.visibility.toLowerCase()}`}>
+              {wishlist.visibility === 'PUBLIC' ? t('wishlist.public') : t('wishlist.private')}
+            </span>
+            
+            {/* Share button - only enabled for PUBLIC wishlists */}
+            {wishlist.visibility === 'PUBLIC' && (
+              <div className="share-button-container">
+              <button 
+                onClick={handleShareWishlist} 
+                className="share-button"
+                aria-label="Share wishlist"
+              >
+                {t('wishlist.share') || 'Share'}
+                <MdShare size={18} /> {/* Adjusted icon size for balance */}
+              </button>
+            </div>
+            )}
+          </div>
+          
           {wishlist.description && (
             <p className="wishlist-description">{wishlist.description}</p>
           )}

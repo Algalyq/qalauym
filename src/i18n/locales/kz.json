@@ -56,7 +56,8 @@
     "emptyWishlists": "Тілектер топтары жоқ. Жаңа топ құрыңыз!",
     "created": "Құрылған",
     "failedToFetchWishlists": "Тілектер топтарын жүктеу мүмкін болмады",
-    "failedToCreateWishlist": "Тілектер тобын құру сәтсіз аяқталды"
+    "failedToCreateWishlist": "Тілектер тобын құру сәтсіз аяқталды",
+    "wishlistCreatedSuccessfully": "Тілектер тізімі сәтті құрылды!"
   },
   "wishlist": {
     "loading": "Тілектер тобы жүктелуде...",
@@ -80,6 +81,9 @@
     "private": "Жеке",
     "created": "Құрылған",
     "failedToLoadWishlist": "Тілектер тобын жүктеу мүмкін болмады",
-    "failedToAddWish": "Сыйлықты қосу сәтсіз аяқталды"
+    "share": "Бөлісу",
+    "failedToAddWish": "Сыйлықты қосу сәтсіз аяқталды",
+    "linkCopied": "Сілтеме алмасу буферіне көшірілді!",
+    "copyFailed": "Сілтемені көшіру мүмкін болмады"
   }
 }

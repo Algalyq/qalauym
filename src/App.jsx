@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import WishlistDetails from './pages/WishlistDetails';
+import SharedWishlist from './pages/SharedWishlist';
 
 // ProtectedRoute component to handle authentication
 const ProtectedRoute = ({ children }) => {
@@ -53,6 +54,8 @@ function AppContent() {
             <WishlistDetails />
           </ProtectedRoute>
         } />
+        {/* Public route for shared wishlists - no authentication required */}
+        <Route path="/shared/wishlist/:id" element={<SharedWishlist />} />
         <Route path="/" element={<Navigate to={currentUser ? "/dashboard" : "/auth"} replace />} />
       </Routes>
     </div>

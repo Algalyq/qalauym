@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'https://api.qalauym.kz', // Using Vite proxy to avoid CORS and SSL certificate issues
+  // baseURL: 'https://api.qalauym.kz',
+  baseURL: 'http://localhost:8082',
   headers: {
     'Content-Type': 'application/json',
     'Accept': '*/*'

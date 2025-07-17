@@ -56,7 +56,8 @@
     "emptyWishlists": "У вас нет групп желаний. Создайте новую группу!",
     "created": "Создано",
     "failedToFetchWishlists": "Не удалось загрузить группы желаний",
-    "failedToCreateWishlist": "Не удалось создать группу желаний"
+    "failedToCreateWishlist": "Не удалось создать группу желаний",
+    "wishlistCreatedSuccessfully": "Группа желаний успешно создана!"
   },
   "wishlist": {
     "loading": "Загрузка группы желаний...",
@@ -80,6 +81,9 @@
     "private": "Приватный",
     "created": "Создано",
     "failedToLoadWishlist": "Не удалось загрузить группу желаний",
-    "failedToAddWish": "Не удалось добавить подарок"
+    "failedToAddWish": "Не удалось добавить подарок",
+    "share": "Поделиться",
+    "linkCopied": "Ссылка скопирована в буфер обмена!",
+    "copyFailed": "Не удалось скопировать ссылку"
   }
 }
