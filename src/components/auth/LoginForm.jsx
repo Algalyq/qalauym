@@ -52,7 +52,7 @@ const LoginForm = ({ onToggleForm }) => {
   const handleGoogleLogin = () => {
     try {
       // Construct the OAuth URL with the correct redirect_uri
-      const oauthUrl = new URL('http://localhost:8080/oauth2/authorization/google');
+      const oauthUrl = new URL('https://api.qalauym.kz/oauth2/authorization/google');
       
       // The backend should be configured to redirect to this URL after successful authentication
       const frontendCallbackUrl = `${window.location.origin}/login/oauth2/code/google`;
