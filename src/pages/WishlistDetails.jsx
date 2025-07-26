@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import wishlistService from '../services/wishlistService';
-// import { uploadImage } from '../services/s3service';
+import { uploadImage } from '../services/s3service';
 import LanguageSelector from '../components/common/LanguageSelector';
 import Toast from '../components/common/Toast';
 import { MdShare, MdImage, MdClose } from 'react-icons/md';
@@ -113,7 +113,7 @@ const WishlistDetails = () => {
     setIsUploading(true);
 
     try {
-      // const result = await uploadImage({ file }, 'wish');
+      const result = await uploadImage({ file }, 'wish');
       setNewWish(prev => ({
         ...prev,
         imageUrl: result.url
