@@ -9,16 +9,23 @@ export default defineConfig({
   },
   // server: {
   //   proxy: {
-  //     '/auth': {
-  //       target: 'https://api.qalauym.kz',
-  //       changeOrigin: true,
-  //       secure: false,  // Игнорировать валидацию SSL
-  //     },
+  //     // Proxy API requests to your backend
   //     '/api': {
   //       target: 'https://api.qalauym.kz',
   //       changeOrigin: true,
-  //       secure: false,  // Игнорировать валидацию SSL
+  //       secure: false,
+  //     },
+  //     // Proxy OAuth requests
+  //     '/oauth2': {
+  //       target: 'https://api.qalauym.kz',
+  //       changeOrigin: true,
+  //       secure: false,
+  //     },
+  //     '/login/oauth2': {
+  //       target: 'https://api.qalauym.kz',
+  //       changeOrigin: true,
+  //       secure: false,
   //     }
   //   }
-  // }
+  // },
 })

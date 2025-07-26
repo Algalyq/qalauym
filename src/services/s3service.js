@@ -3,19 +3,26 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Upload } from '@aws-sdk/lib-storage';
 
 // Configure AWS with environment variables
-if (!process.env.REACT_APP_AWS_ACCESS_KEY_ID || !process.env.REACT_APP_AWS_SECRET_ACCESS_KEY) {
+const {
+  VITE_AWS_ACCESS_KEY_ID,
+  VITE_AWS_SECRET_ACCESS_KEY,
+  VITE_AWS_REGION = 'eu-north-1',
+  VITE_S3_BUCKET_NAME = 'qalauym'
+} = import.meta.env;
+
+if (!VITE_AWS_ACCESS_KEY_ID || !VITE_AWS_SECRET_ACCESS_KEY) {
   console.error('AWS credentials are not properly configured in environment variables');
 }
 
 const s3Client = new S3Client({
-  region: process.env.REACT_APP_AWS_REGION || 'eu-north-1',
+  region: VITE_AWS_REGION,
   credentials: {
-    accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-    secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+    accessKeyId: VITE_AWS_ACCESS_KEY_ID,
+    secretAccessKey: VITE_AWS_SECRET_ACCESS_KEY,
   },
 });
 
-const BUCKET_NAME = process.env.REACT_APP_S3_BUCKET_NAME || 'qalauym';
+const BUCKET_NAME = VITE_S3_BUCKET_NAME;
 
 /**
  * Uploads an image to S3
