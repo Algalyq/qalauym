@@ -1,30 +1,28 @@
-import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import WishlistDetails from './pages/WishlistDetails';
 import SharedWishlist from './pages/SharedWishlist';
+import OAuthCallback from './pages/OAuthCallback';
 
-// ProtectedRoute component to handle authentication
+
 const ProtectedRoute = ({ children }) => {
-  const { currentUser } = useAuth();
-  
-  if (!currentUser) {
+
+  if(localStorage.getItem('token') == null){
     return <Navigate to="/auth" replace />;
   }
-  
   return children;
 };
 
-// App wrapper with AuthProvider and Router
 function AppWithAuth() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
-        <AppContent />
-      </BrowserRouter>
-    </AuthProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <AppContent />
+        </BrowserRouter>
+      </AuthProvider>
   );
 }
 
@@ -56,6 +54,11 @@ function AppContent() {
         } />
         {/* Public route for shared wishlists - no authentication required */}
         <Route path="/shared/wishlist/:id" element={<SharedWishlist />} />
+        
+        {/* OAuth callback route */}
+        <Route path="/oauth2/redirect" element={<OAuthCallback />} />
+        
+        {/* Default route */}
         <Route path="/" element={<Navigate to={currentUser ? "/dashboard" : "/auth"} replace />} />
       </Routes>
     </div>

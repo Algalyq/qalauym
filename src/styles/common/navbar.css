@@ -1,0 +1,84 @@
+.navbar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    background-color: #ffffff;
+    border-top: 1px solid #e5e5e5;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+  }
+
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    color: #9ca3af;
+  }
+
+  .nav-item.active {
+    color: #3b82f6;
+  }
+
+  .nav-icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+    position: relative;
+  }
+
+  /* Home icon styles */
+  .nav-icon.home::before {
+    content: '🏠';
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Plus icon styles */
+  .nav-icon.plus::before {
+    content: '+';
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* Calendar icon styles */
+  .nav-icon.calendar::before {
+    content: '📋';
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  /* User icon styles */
+  .nav-icon.user::before {
+    content: '👤';
+    font-size: 18px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .nav-label {
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  .nav-item:hover {
+    color: #3b82f6;
+}

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import LanguageSelector from '../common/LanguageSelector';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import '../../styles/auth/login-form.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const LoginForm = ({ onToggleForm }) => {
   const { t, i18n } = useTranslation();
@@ -13,11 +14,14 @@ const LoginForm = ({ onToggleForm }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
   
   const { login } = useAuth();
   
   // Check if current language is Russian or Kazakh
   const isRuOrKz = i18n.language === 'ru' || i18n.language === 'kz';
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,7 +35,10 @@ const LoginForm = ({ onToggleForm }) => {
 
     try {
       await login(username, password);
+      // Navigate to dashboard after successful login
+      navigate('/dashboard', { replace: true });
     } catch (err) {
+      console.error('Login error:', err);
       setError(t('auth.errors.failedToLogin'));
     } finally {
       setLoading(false);
@@ -40,6 +47,27 @@ const LoginForm = ({ onToggleForm }) => {
   
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
+  };
+
+  const handleGoogleLogin = () => {
+    try {
+      // Construct the OAuth URL with the correct redirect_uri
+      const oauthUrl = new URL('http://localhost:8080/oauth2/authorization/google');
+      
+      // The backend should be configured to redirect to this URL after successful authentication
+      const frontendCallbackUrl = `${window.location.origin}/login/oauth2/code/google`;
+      // const frontendCallbackUrl = `${window.location.origin}/oauth2/callback`;
+      // Add the redirect_uri as a query parameter
+      oauthUrl.searchParams.append('redirect_uri', frontendCallbackUrl);
+      
+      // For Google OAuth2, it's better to use a full page redirect
+      // rather than making an AJAX request
+      window.location.href = oauthUrl.toString();
+      
+    } catch (error) {
+      console.error('Error initiating Google login:', error);
+      setError(t('auth.errors.googleLoginFailed'));
+    }
   };
 
   return (
@@ -116,6 +144,7 @@ const LoginForm = ({ onToggleForm }) => {
           <button
             type="button"
             className="social-button google"
+            onClick={handleGoogleLogin}
           >
             <FcGoogle size={24} />
           </button>

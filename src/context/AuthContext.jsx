@@ -9,22 +9,37 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Real login function using API
-  const login = async (username, password) => {
-    try {
-      const response = await authService.login(username, password);
-      // Store user data in localStorage
-      const user = { username, ...response };
+  // Login function that can be used for both email/password and OAuth
+// Login function that can be used for both email/password and OAuth
+const login = async (usernameOrData, password, isOAuth = false) => {
+  try {
+    let user;
+    
+    if (isOAuth) {
+      console.log("Work this isOAuth");
+      // For OAuth, usernameOrData is the user data object
+      user = usernameOrData;
       localStorage.setItem('user', JSON.stringify(user));
-      console.log(user);
+    } else {
+      console.log("Work this isEmail");
+      // For email/password login, usernameOrData is the username string
+      const response = await authService.login(usernameOrData, password);
+      console.log(response);
+      user = { 
+        username: usernameOrData, 
+        ...response 
+      };
+      localStorage.setItem('user', JSON.stringify(user));
       localStorage.setItem('token', response.data.accessToken);
-      setCurrentUser(user);
-      return user;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
     }
-  };
+    
+    setCurrentUser(user);
+    return user;
+  } catch (error) {
+    console.error('Login error:', error);
+    throw error;
+  }
+};
 
   // Real registration function using API
   const register = async (userData) => {

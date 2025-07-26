@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'https://api.qalauym.kz',
-  // baseURL: 'http://localhost:8082',
+  // baseURL: 'https://api.qalauym.kz',
+  baseURL: 'http://localhost:8080',
   headers: {
     'Content-Type': 'application/json',
     'Accept': '*/*'
@@ -73,7 +73,7 @@ api.interceptors.response.use(
           // No refresh token available, logout user
           localStorage.removeItem('accessToken');
           localStorage.removeItem('refreshToken');
-          window.location.href = '/login'; // Redirect to login
+          // window.location.href = '/auth'; // Redirect to auth page
           return Promise.reject(error);
         }
         
@@ -98,10 +98,10 @@ api.interceptors.response.use(
         processQueue(refreshError, null);
         isRefreshing = false;
         
-        // Clear auth data and redirect to login
+        // Clear auth data and redirect to auth page
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
-        window.location.href = '/login'; // Redirect to login
+        // window.location.href ='/auth'; // Redirect to auth page
         
         return Promise.reject(refreshError);
       }
@@ -121,7 +121,7 @@ export const authService = {
         username,
         password
       });
-      
+      console.log("Login response:", response)
       // Store tokens in localStorage
       if (response.data.accessToken) {
         localStorage.setItem('accessToken', response.data.accessToken);
@@ -177,6 +177,24 @@ export const authService = {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     // You might want to call a logout endpoint here if needed
+  },
+
+
+  googleLogin: async (code) => {
+    try {
+      const response = await api.post('/login/oauth2/code/google', { code });
+      // The response should contain the JWT token
+      const { token } = response.data;
+      
+      // Store the token in localStorage
+      localStorage.setItem('token', token);
+      
+      // Return the response data which includes the token and any user info
+      return response.data;
+    } catch (error) {
+      console.error('Google OAuth error:', error);
+      throw error;
+    }
   }
 };
 

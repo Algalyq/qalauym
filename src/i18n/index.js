@@ -28,7 +28,17 @@ i18n
     },
     detection: {
       order: ['localStorage', 'navigator'],
-      caches: ['localStorage']
+      caches: ['localStorage'],
+      lookupLocalStorage: 'i18nextLng', // Explicitly set the localStorage key
+      lookupFromPathIndex: 0,
+      // Save language to localStorage when it changes
+      caches: ['localStorage'],
+      // This ensures the language is saved to localStorage
+      saveMissing: true,
+      // This will save the language to localStorage when changed
+      onLanguageChanged: (lng) => {
+        localStorage.setItem('i18nextLng', lng);
+      }
     }
   });
 

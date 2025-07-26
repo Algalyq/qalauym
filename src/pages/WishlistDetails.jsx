@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import wishlistService from '../services/wishlistService';
+import { uploadImage } from '../services/s3service';
 import LanguageSelector from '../components/common/LanguageSelector';
 import Toast from '../components/common/Toast';
-import { MdShare } from 'react-icons/md';
-import '../styles/dashboard/wishlist-details.css'; // We'll create this CSS file next
+import { MdShare, MdImage, MdClose } from 'react-icons/md';
+import '../styles/dashboard/wishlist-details.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -32,6 +33,9 @@ const WishlistDetails = () => {
     url: '',
     imageUrl: ''
   });
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
   const [isAddingWish, setIsAddingWish] = useState(false);
 
   // Fetch wishlist details and wishes
@@ -88,11 +92,66 @@ const WishlistDetails = () => {
       [name]: value
     }));
   };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    // Check if file is an image
+    if (!file.type.startsWith('image/')) {
+      toast.error(t('wishlist.invalidImageType') || 'Please select a valid image file');
+      return;
+    }
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error(t('wishlist.imageTooLarge') || 'Image size should be less than 5MB');
+      return;
+    }
+
+    setSelectedImage(file);
+    setIsUploading(true);
+
+    try {
+      const result = await uploadImage({ file }, 'wish');
+      setNewWish(prev => ({
+        ...prev,
+        imageUrl: result.url
+      }));
+      toast.success(t('wishlist.imageUploaded') || 'Image uploaded successfully!');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error(t('wishlist.uploadFailed') || 'Failed to upload image');
+      setSelectedImage(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const removeImage = () => {
+    setSelectedImage(null);
+    setNewWish(prev => ({
+      ...prev,
+      imageUrl: ''
+    }));
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
   
   const handleAddWish = async (e) => {
     e.preventDefault();
     
-    if (!newWish.title.trim()) return;
+    if (!newWish.title.trim()) {
+      toast.error(t('wishlist.titleRequired') || 'Title is required');
+      return;
+    }
+    
+    if (isUploading) {
+      toast.warning(t('wishlist.uploadInProgress') || 'Please wait for image upload to complete');
+      return;
+    }
     
     try {
       const createdWish = await wishlistService.addWishToWishlist(newWish, currentUser.data.accessToken);
@@ -262,6 +321,7 @@ const WishlistDetails = () => {
             <div className="card">
               <h2 className="card-title">{t('wishlist.addNewGift')}</h2>
               <form onSubmit={handleAddWish}>
+              
                 <div className="form-group">
                   <label htmlFor="title" className="form-label">
                     {t('wishlist.giftTitle')}*
@@ -290,6 +350,51 @@ const WishlistDetails = () => {
                     className="form-input-wish form-textarea"
                     placeholder={t('wishlist.giftDescriptionPlaceholder')}
                   />
+                </div>
+                
+                <div className="form-group">
+                  <label className="form-label">
+                    {t('wishlist.image')}
+                  </label>
+                  <div className="image-upload-container">
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleImageChange}
+                      accept="image/*"
+                      style={{ display: 'none' }}
+                    />
+                    {selectedImage ? (
+                      <div className="image-preview">
+                        <img 
+                          src={URL.createObjectURL(selectedImage)} 
+                          alt="Preview" 
+                          className="preview-image"
+                        />
+                        <button 
+                          type="button" 
+                          className="remove-image-btn"
+                          onClick={removeImage}
+                          disabled={isUploading}
+                        >
+                          <MdClose size={20} />
+                        </button>
+                        {isUploading && (
+                          <div className="upload-progress">
+                            {t('wishlist.uploading') || 'Uploading...'}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div 
+                        className="image-upload-placeholder"
+                        onClick={triggerFileInput}
+                      >
+                        <MdImage size={32} className="upload-icon" />
+                        <span>{t('wishlist.uploadImage') || 'Upload an image'}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="form-group">
