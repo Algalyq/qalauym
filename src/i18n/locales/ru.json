@@ -18,6 +18,7 @@
     "registerHere": "Зарегистрируйтесь здесь",
     "alreadyHaveAccount": "Уже есть аккаунт?",
     "loginHere": "Войдите здесь",
+    "sessionExpired": "Сессия истекла. Пожалуйста, войдите снова.",
     "orLoginWith": "или войти через",
     "orRegisterWith": "или зарегистрироваться через",
     "errors": {
@@ -47,8 +48,11 @@
     "createNewWishlist": "Создать новую группу желаний",
     "wishlistTitle": "Название группы желаний",
     "wishlistTitlePlaceholder": "Введите название для вашей группы желаний",
+    "wishlistDescription": "Описание группы желаний",
     "wishlistDescriptionPlaceholder": "Введите описание группы желаний",
     "visibility": "Видимость",
+    "welcomeTitle":"Твой первый шаг к желанию!",
+    "welcomeDescription":"Сейчас здесь пусто. Но скоро здесь появятся твои самые большие амбиции.",
     "public": "Публичный",
     "private": "Приватный",
     "createWishlist": "Создать группу желаний",
@@ -91,5 +95,12 @@
     "capsules": "Подарки",
     "plans": "Қалауым",
     "account": "Аккаунт"
+  },
+  "common": {
+    "creating":"Создать",
+    "cancel":"Отмена"
+  },
+  "wishlists": {
+    "title": "Список"
   }
 }

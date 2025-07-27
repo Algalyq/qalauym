@@ -7,25 +7,12 @@ export default defineConfig({
   css: {
     postcss: './postcss.config.js',
   },
-  // server: {
-  //   proxy: {
-  //     // Proxy API requests to your backend
-  //     '/api': {
-  //       target: 'https://api.qalauym.kz',
-  //       changeOrigin: true,
-  //       secure: false,
-  //     },
-  //     // Proxy OAuth requests
-  //     '/oauth2': {
-  //       target: 'https://api.qalauym.kz',
-  //       changeOrigin: true,
-  //       secure: false,
-  //     },
-  //     '/login/oauth2': {
-  //       target: 'https://api.qalauym.kz',
-  //       changeOrigin: true,
-  //       secure: false,
-  //     }
-  //   }
-  // },
+  server: {
+    host: '0.0.0.0', // Listen on all network interfaces
+    port: 5173, // Default Vite port
+    strictPort: true,
+    hmr: {
+      clientPort: 5173, // Important for HMR to work on mobile
+    },
+  },
 })

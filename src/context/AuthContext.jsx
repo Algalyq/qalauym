@@ -24,12 +24,7 @@ const login = async (usernameOrData, password, isOAuth = false) => {
       console.log("Work this isEmail");
       // For email/password login, usernameOrData is the username string
       const response = await authService.login(usernameOrData, password);
-      console.log(response);
-      user = { 
-        username: usernameOrData, 
-        ...response 
-      };
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('profile', JSON.stringify(response.data.userProfile));
       localStorage.setItem('token', response.data.accessToken);
     }
     

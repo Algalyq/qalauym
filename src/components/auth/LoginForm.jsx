@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import '../../styles/auth/login-form.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import api from '../../services/api';
 
 const LoginForm = ({ onToggleForm }) => {
   const { t, i18n } = useTranslation();
@@ -51,12 +52,11 @@ const LoginForm = ({ onToggleForm }) => {
 
   const handleGoogleLogin = () => {
     try {
-      // Construct the OAuth URL with the correct redirect_uri
-      const oauthUrl = new URL('https://api.qalauym.kz/oauth2/authorization/google');
+      // Construct the OAuth URL with the correct redirect_uri using api's baseURL
+      const oauthUrl = new URL('/oauth2/authorization/google', api.defaults.baseURL);
       
       // The backend should be configured to redirect to this URL after successful authentication
       const frontendCallbackUrl = `${window.location.origin}/login/oauth2/code/google`;
-      // const frontendCallbackUrl = `${window.location.origin}/oauth2/callback`;
       // Add the redirect_uri as a query parameter
       oauthUrl.searchParams.append('redirect_uri', frontendCallbackUrl);
       

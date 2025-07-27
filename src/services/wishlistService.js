@@ -4,11 +4,14 @@ export const wishlistService = {
   // Create a new wishlist
   createWishlist: async (wishlistData, token) => {
     try {
+      console.log('Sending wishlist data to API:', wishlistData);
       const response = await api.post('/wishlists', wishlistData, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
+      console.log('API response:', response);
       return response.data;
     } catch (error) {
       console.error('Create wishlist error:', error);

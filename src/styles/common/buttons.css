@@ -1,0 +1,25 @@
+.q-add-button {
+    background-color: #D6F738;
+    border: none;
+    border-radius: 8px;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a202c;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center; 
+    gap: 8px; 
+  }
+  
+  .q-add-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(166, 230, 53, 0.4);
+  }
+  
+  .q-add-button:active {
+    transform: translateY(0);
+  }

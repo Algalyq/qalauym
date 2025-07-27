@@ -18,6 +18,7 @@
     "registerHere": "Мұнда тіркеліңіз",
     "alreadyHaveAccount": "Тіркелгіңіз бар ма?",
     "loginHere": "Мұнда кіріңіз",
+    "sessionExpired": "Сессия аяқталды. Қайта кіріңіз.",
     "orLoginWith": "немесе арқылы кіру",
     "orRegisterWith": "немесе арқылы тіркелу",
     "errors": {
@@ -47,11 +48,14 @@
     "createNewWishlist": "Жаңа тілектер тобын құру",
     "wishlistTitle": "Тілектер тобының атауы",
     "wishlistTitlePlaceholder": "Тілектер тобыңызға атау беріңіз",
+    "wishlistDescription":"Тілектер тобыңыздың сипаттамасы",
     "wishlistDescriptionPlaceholder": "Тілектер тобыңыздың сипаттамасын енгізіңіз",
     "visibility": "Көрінімділік",
     "public": "Жалпыға қолжетімді",
+    "welcomeTitle":"Сенің қалауына алғашқы қадам!",
+    "welcomeDescription":"Қазір бұл жер бос. Бірақ дәл осы жерден бастап сенің үлкен өзгерістер күтеді.",
     "private": "Жеке",
-    "createWishlist": "Тілектер тобын құру",
+    "createWishlist": "Менің қалауым",
     "loadingWishlists": "Тілектер тобы жүктелуде...",
     "emptyWishlists": "Тілектер топтары жоқ. Жаңа топ құрыңыз!",
     "created": "Құрылған",
@@ -91,5 +95,12 @@
     "capsules": "Сыйлықтар",
     "plans": "Қалауым",
     "account": "Аккаунт"
+  },
+  "common": {
+    "creating":"Құрылуы",
+    "cancel":"Болдырмау"
+  },
+  "wishlists": {
+    "title": "Тізімдер"
   }
 }

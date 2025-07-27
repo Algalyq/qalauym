@@ -1,14 +1,21 @@
 import React from 'react';
 import Icon from '../Icon/Icon';
-import '../../styles/common/buttons.css';
+import '../../../styles/common/buttons.css';
+import '../../../styles/common/typography.css'
+import { useTranslation } from 'react-i18next';
 
-const QAddButton = () => {
+const QAddButton = ({ onClick }) => {
+    const { t } = useTranslation();
     return (
-        <button className="q-add-button">
-            <Icon name="plus" size={24} />
-            <span>Қалауым</span>
+        <button className="q-add-button" onClick={onClick}>
+            <Icon name="edit" size={16} />
+            <span className="body2">{t('dashboard.createWishlist')}</span>
         </button>
     );
+};
+
+QAddButton.defaultProps = {
+    onClick: () => {}
 };
 
 export default QAddButton;
