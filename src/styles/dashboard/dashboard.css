@@ -1,19 +1,27 @@
 /* Dashboard Styles */
 .dashboard {
-  min-height: 100vh;
+  height: 100vh;
+  max-height: 100vh;
   font-family: var(--font-body);
   position: relative;
-  padding-bottom: 80px; /* Space for bottom nav */
-  display: flex; /* Enable flexbox for centering */
-  justify-content: center; /* Center horizontally */
-  align-items: center; /* Center vertically */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .dashboard-content {
-  max-width: 1200px; /* Set a max-width for larger screens */
+  max-width: 1200px;
   width: 100%;
-  padding: 20px;
+  height: 100%;
   margin: 0 auto;
+  padding: 20px;
+  overflow-y: auto; /* Allow scrolling only within content */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+}
+
+.dashboard-content::-webkit-scrollbar {
+  display: none; /* Hide scrollbar for Chrome/Safari */
 }
 /* Hero Section */
 .dashboard-hero {

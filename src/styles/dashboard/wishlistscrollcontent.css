@@ -2,7 +2,7 @@
 .wishlist-scroll-content {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  /* height: 100%; */
   position: relative;
   overflow: hidden;
   padding: 0;
@@ -11,14 +11,13 @@
 .scroll-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   flex: 1;
-  width: 100%;
   height: 100%;
-  margin: 0 auto;
-  padding: 20px 0;
+  padding: 0;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* Header */
@@ -38,7 +37,7 @@
   .scroll-container-wrapper {
     position: relative;
     width: 100%;
-    margin-bottom: 40px;
+    /* margin-bottom: 40px; */
   }
   
   .scroll-container {
@@ -47,15 +46,16 @@
     scroll-behavior: smooth;
     scrollbar-width: none; /* Firefox */
     scroll-snap-type: x mandatory;
-    scroll-padding: 0 calc(50vw - 140px); /* Centers cards properly */
-    -ms-overflow-style: none; /* IE and Edge */
-    padding: 60px 20px 40px;
-    gap: 20px;
+    -ms-overflow-style: none;
+    gap: 10px;
     cursor: grab;
     user-select: none;
     align-items: flex-end;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 0 20px;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scroll-padding: 0 50%; /* Center the active item */
+    overscroll-behavior-x: contain; /* Prevent scroll chaining */
+    width: 100%;
+    margin: 0 auto;
   }
   
   .scroll-container::-webkit-scrollbar {
@@ -70,7 +70,7 @@
   /* Wishlist Cards */
   .wishlist-card-scroll {
     flex: 0 0 280px;
-    height: 480px;
+    height: auto;
     background: white;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
@@ -168,9 +168,12 @@
   .pagination-dots {
     display: flex;
     justify-content: center;
-    gap: 8px;
-    margin-bottom: 40px;
-    padding: 0 20px;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    padding: 10px 0 0;
+    position: relative;
+    z-index: 5;
   }
   
   .dot {
@@ -181,7 +184,6 @@
     background: #cbd5e0;
     cursor: pointer;
     transition: all 0.3s ease;
-    padding: 0;
   }
   
   .dot.active {
@@ -241,65 +243,139 @@
   /* Mobile Responsive */
   @media (max-width: 768px) {
     .wishlist-scroll-content {
-      padding: 10px 0;
+      padding: 0;
+      min-height: 0;
+      width: 100%;
+      overflow: hidden;
     }
-  
-  
+    
     .page-title {
-      font-size: 28px;
+      font-size: 24px;
+      padding: 16px 20px 8px;
     }
-  
+    
     .scroll-container {
-      padding: 0 16px;
-      gap: 16px;
+      padding: 30px 10px 15px;
+      gap: 0px;
+      scroll-padding: 0 calc(50% - 130px);
     }
-  
+    
     .wishlist-card-scroll {
-      flex: 0 0 260px;
-      height: 350px;
+      flex: 0 0 auto;
+      height: auto;
+      max-height: 100%;
+      overflow-y: hidden;
+      scroll-snap-align: center;
     }
-  
-    .card-content {
-      padding: 20px;
+    
+    .wishlist-card-scroll.active {
+      transform: scale(1) translateY(0);
+      height: auto;
+      overflow-y: visible;
     }
-  
+    
     .wishlist-title-scroll {
-      font-size: 20px;
+      font-size: 18px;
+      margin-bottom: 12px;
     }
-  
+    
     .item-count {
       font-size: 14px;
     }
-  
+    
     .create-button-container {
-      padding: 0 16px;
+      padding: 0 20px 20px;
+      position: sticky;
+      bottom: 0;
+      background: white;
+      z-index: 10;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
     }
-  
+    
     .create-wishlist-btn-scroll {
-      padding: 16px 24px;
+      padding: 14px 20px;
       font-size: 15px;
+      width: 100%;
+      max-width: 100%;
+      border-radius: 12px;
     }
-  
+    
     .pagination-dots {
-      padding: 0 16px;
-      margin-bottom: 30px;
+      padding: 0 20px 5px;
+      margin: 0;
+      position: sticky;
+      z-index: 5;
+      padding-top: 5px;
     }
   }
   
-  @media (max-width: 480px) {
-    .page-title {
-      font-size: 24px;
-    }
-  
-    .wishlist-card-scroll {
-      flex: 0 0 240px;
-      height: 400px;
-    }
-  
-    .wishlist-title-scroll {
-      font-size: 18px;
-    }
+/* Existing styles remain, add or modify these sections */
+
+/* Disable scrolling on desktop */
+@media (min-width: 481px) {
+  .wishlist-scroll-content {
+    overflow-x: hidden;
   }
+
+  .scroll-container {
+    overflow-x: hidden !important; /* Override any inherited scrolling */
+    flex-direction: column; /* Stack cards vertically */
+    align-items: center; /* Center cards */
+    height: auto; /* Allow natural height */
+    padding: 0;
+  }
+
+  .wishlist-card-scroll {
+    flex: 0 0 auto; /* Remove fixed width constraint */
+    width: 280px; /* Fixed width for consistency */
+    margin-bottom: 20px; /* Space between stacked cards */
+    transform: none !important; /* Remove scaling/translation effects */
+    opacity: 1 !important; /* Full opacity for all cards */
+  }
+
+  .wishlist-card-scroll.active {
+    border-color: #a3e635; /* Keep active state highlight */
+    transform: none; /* No scaling on desktop */
+  }
+
+  .pagination-dots {
+    display: none; /* Hide pagination on desktop */
+  }
+}
+
+/* Keep mobile scrolling behavior */
+@media (max-width: 480px) {
+  .wishlist-scroll-content {
+    overflow-x: hidden; /* Container doesn't scroll, only inner container */
+  }
+
+  .scroll-container {
+    overflow-x: auto; /* Enable horizontal scrolling on mobile */
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 10px;
+    padding: 30px 10px 30px;
+  }
+
+  .wishlist-card-scroll {
+    flex: 0 0 75vw; /* Match mobile design width */
+    min-height: 55vh;
+    scroll-snap-align: center;
+    margin: 0 10px;
+    transform: scale(0.9) translateY(20px); /* Restore mobile scaling */
+    opacity: 0.8; /* Restore mobile opacity */
+  }
+
+  .wishlist-card-scroll.active {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Add a focused card style for desktop */
+.wishlist-card-scroll.focused {
+  border-color: #a3e635;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
   
   /* Smooth scrolling animation */
   @media (prefers-reduced-motion: no-preference) {
