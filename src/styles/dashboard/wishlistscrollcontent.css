@@ -74,7 +74,7 @@
     background: white;
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s ease-in-out;
     cursor: pointer;
     position: relative;
     overflow: hidden;
@@ -363,11 +363,13 @@
     margin: 0 10px;
     transform: scale(0.9) translateY(20px); /* Restore mobile scaling */
     opacity: 0.8; /* Restore mobile opacity */
+    transition: all 0.4s ease-in-out; 
   }
 
   .wishlist-card-scroll.active {
     transform: scale(1) translateY(0);
     opacity: 1;
+    transition: all 0.4s ease-in-out; 
   }
 }
 
@@ -385,6 +387,7 @@
     
     .scroll-container {
       scroll-behavior: smooth;
+      transition: transform 0.4s ease-in-out;
     }
   }
   

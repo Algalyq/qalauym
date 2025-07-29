@@ -39,7 +39,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     setCurrentIndex(index);
   }, [cardWidth, isMobile]);
 
-  // Drag handlers (only for mobile)
+  // Drag handlers (only for mobile) with reduced sensitivity
   const handleMouseDown = useCallback((e) => {
     if (!isMobile || !scrollContainerRef.current) return;
     setIsDragging(true);
@@ -52,7 +52,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     if (!isMobile || !isDragging || !scrollContainerRef.current) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.5;
+    const walk = (x - startX) * 1.0; // Reduced from 1.5 to 1.0 for easier swipe
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   }, [isMobile, isDragging, startX, scrollLeft]);
 
@@ -70,7 +70,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     }, 100);
   }, [isMobile, isDragging, scrollToIndex, sampleWishlists.length, cardWidth]);
 
-  // Touch handlers (only for mobile)
+  // Touch handlers (only for mobile) with reduced sensitivity
   const handleTouchStart = useCallback((e) => {
     if (!isMobile || !scrollContainerRef.current) return;
     setIsDragging(true);
@@ -81,7 +81,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
   const handleTouchMove = useCallback((e) => {
     if (!isMobile || !isDragging || !scrollContainerRef.current) return;
     const x = e.touches[0].pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.2;
+    const walk = (x - startX) * 0.8; // Reduced from 1.2 to 0.8 for easier swipe
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   }, [isMobile, isDragging, startX, scrollLeft]);
 
@@ -156,7 +156,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                 className={`wishlist-card-scroll ${index === currentIndex ? 'active' : ''} ${
                   !isMobile && index === currentIndex ? 'focused' : ''
                 }`}
-                onClick={() => onSelectWishlist && onSelectWishlist(wishlist)} // Card click for selection
+                onClick={() => onSelectWishlist && onSelectWishlist(wishlist)}
                 tabIndex={index === currentIndex ? 0 : -1}
                 aria-label={`Wishlist: ${wishlist.title}, ${wishlist.itemCount} items`}
               >
@@ -173,7 +173,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                     <button
                       className="share-icon"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent card click from triggering
+                        e.stopPropagation();
                         onShareWishlist && onShareWishlist(wishlist);
                       }}
                       aria-label={`Share ${wishlist.title} wishlist`}
