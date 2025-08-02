@@ -91,6 +91,14 @@
   margin: 0;
 }
 
+
+.subbody3 {
+  font-family: 'Mulish', system-ui;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+}
+
 /* Captions */
 .caption-bold {
   font-family: 'Mulish', sans-serif;

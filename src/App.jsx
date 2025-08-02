@@ -5,12 +5,16 @@ import Auth from './pages/Auth';
 import Dashboard from './pages/Dashboard';
 import WishlistDetails from './pages/WishlistDetails';
 import SharedWishlist from './pages/SharedWishlist';
+import AddWishes from './pages/AddWishes';
 import OAuthCallback from './pages/OAuthCallback';
-
+import { isTokenExpired } from './utils/authUtils';
+import MobileOnlyMessage from './components/common/MobileOnlyMessage';
+import './styles/common/mobileonly.css';
 
 const ProtectedRoute = ({ children }) => {
-
-  if(localStorage.getItem('token') == null){
+  const token = localStorage.getItem('token');
+  // Check if token doesn't exist OR if it exists but is expired
+  if (!token && !isTokenExpired(token)) {
     return <Navigate to="/auth" replace />;
   }
   return children;
@@ -28,7 +32,24 @@ function AppWithAuth() {
 
 // Main app content with routes
 function AppContent() {
-  const { currentUser } = useAuth();
+  const token = localStorage.getItem('token');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 512);
+  // Check if token doesn't exist OR if it exists but is expired
+  const isTrue = (!token && !isTokenExpired(token));
+  
+  // Check if device is mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 512);
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Check on initial load
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
   
   // Apply background color to body
   useEffect(() => {
@@ -38,10 +59,20 @@ function AppContent() {
     };
   }, []);
 
+  // If not on mobile device, show mobile only message
+  if (!isMobile) {
+    return (
+      <div className="min-h-screen">
+        <MobileOnlyMessage />
+      </div>
+    );
+  }
+
+  // Otherwise show normal app content for mobile users
   return (
     <div className="min-h-screen">
       <Routes>
-        <Route path="/auth" element={currentUser ? <Navigate to="/dashboard" replace /> : <Auth />} />
+        <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
             <Dashboard />
@@ -52,6 +83,11 @@ function AppContent() {
             <WishlistDetails />
           </ProtectedRoute>
         } />
+        <Route path="/addwishes/:id" element={
+          <ProtectedRoute>
+            <AddWishes />
+          </ProtectedRoute>
+        } />
         {/* Public route for shared wishlists - no authentication required */}
         <Route path="/shared/wishlist/:id" element={<SharedWishlist />} />
         
@@ -59,7 +95,7 @@ function AppContent() {
         <Route path="/oauth2/redirect" element={<OAuthCallback />} />
         
         {/* Default route */}
-        <Route path="/" element={<Navigate to={currentUser ? "/dashboard" : "/auth"} replace />} />
+        <Route path="/" element={<Navigate to={isTrue ? "/auth" : "/dashboard"} replace />} />
       </Routes>
     </div>
   );

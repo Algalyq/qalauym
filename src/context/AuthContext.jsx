@@ -14,14 +14,11 @@ export function AuthProvider({ children }) {
 const login = async (usernameOrData, password, isOAuth = false) => {
   try {
     let user;
-    
     if (isOAuth) {
-      console.log("Work this isOAuth");
       // For OAuth, usernameOrData is the user data object
       user = usernameOrData;
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('profile', JSON.stringify(user));
     } else {
-      console.log("Work this isEmail");
       // For email/password login, usernameOrData is the username string
       const response = await authService.login(usernameOrData, password);
       localStorage.setItem('profile', JSON.stringify(response.data.userProfile));
@@ -42,7 +39,7 @@ const login = async (usernameOrData, password, isOAuth = false) => {
       const response = await authService.register(userData);
       // Store user data in localStorage
       const user = { ...userData, ...response };
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('profile', JSON.stringify(user));
       localStorage.setItem('token', response.token || response.accessToken || '');
       setCurrentUser(user);
       return user;
@@ -54,7 +51,7 @@ const login = async (usernameOrData, password, isOAuth = false) => {
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('profile');
     localStorage.removeItem('token');
     setCurrentUser(null);
     return Promise.resolve();
@@ -62,7 +59,7 @@ const login = async (usernameOrData, password, isOAuth = false) => {
 
   // Check if user is logged in on initial load
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem('profile');
     if (storedUser) {
       setCurrentUser(JSON.parse(storedUser));
     }

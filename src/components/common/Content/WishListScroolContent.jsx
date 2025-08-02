@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import '../../../styles/dashboard/dashboard.css';
 import '../../../styles/common/typography.css';
 import '../../../styles/dashboard/wishlistscrollcontent.css';
@@ -6,6 +7,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Icon from '../Icon/Icon';
 
 const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishlist, onShareWishlist }) => {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const scrollContainerRef = useRef(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -14,17 +16,11 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
   const [scrollLeft, setScrollLeft] = useState(0);
 
   // Sample data if no wishlists provided
-  const sampleWishlists = wishlists.length > 0 ? wishlists : [
-    { id: 1, title: 'BIRTHDAY WISHES', itemCount: 5, isActive: false },
-    { id: 2, title: 'TRAVEL DREAMS', itemCount: 8, isActive: true },
-    { id: 3, title: 'TECH GADGETS', itemCount: 3, isActive: false },
-    { id: 4, title: 'BOOKS TO READ', itemCount: 12, isActive: false },
-    { id: 5, title: 'FITNESS GOALS', itemCount: 6, isActive: false },
-  ];
+  const sampleWishlists = wishlists.length > 0 ? wishlists : [];
 
   // Fixed card width for mobile, adjust for desktop
   const cardWidth = 300;
-  const isMobile = window.innerWidth <= 480;
+  const isMobile = window.innerWidth <= 512;
 
   // Scroll to index (only for mobile)
   const scrollToIndex = useCallback((index) => {
@@ -99,9 +95,22 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
       if (!ticking) {
         requestAnimationFrame(() => {
           const scrollLeft = container.scrollLeft;
-          const newIndex = Math.round(scrollLeft / cardWidth);
-          const clampedIndex = Math.max(0, Math.min(newIndex, sampleWishlists.length - 1));
-          setCurrentIndex(clampedIndex);
+          const containerWidth = container.clientWidth;
+          const scrollWidth = container.scrollWidth;
+          
+          // Check if we're close to the end of the scroll area
+          const isNearEnd = scrollLeft + containerWidth >= scrollWidth - 20;
+          
+          if (isNearEnd) {
+            // If near the end, set the last item as active
+            setCurrentIndex(sampleWishlists.length - 1);
+          } else {
+            // Otherwise use the standard calculation
+            const newIndex = Math.round(scrollLeft / cardWidth);
+            const clampedIndex = Math.max(0, Math.min(newIndex, sampleWishlists.length - 1));
+            setCurrentIndex(clampedIndex);
+          }
+          
           ticking = false;
         });
         ticking = true;
@@ -156,20 +165,22 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                 className={`wishlist-card-scroll ${index === currentIndex ? 'active' : ''} ${
                   !isMobile && index === currentIndex ? 'focused' : ''
                 }`}
-                onClick={() => onSelectWishlist && onSelectWishlist(wishlist)}
+                onClick={() => {
+                  // Navigate directly to wishlist details page without token check
+                  navigate(`/wishlist/${wishlist.id}`);
+                  
+                  // Call the original onSelectWishlist handler if provided
+                  if (onSelectWishlist) onSelectWishlist(wishlist);
+                }}
                 tabIndex={index === currentIndex ? 0 : -1}
                 aria-label={`Wishlist: ${wishlist.title}, ${wishlist.itemCount} items`}
               >
                 <div className="card-content">
                   <div className="card-body">
                     <h3 className="wishlist-title-scroll">{wishlist.title}</h3>
-                    {wishlist.itemCount && (
-                      <p className="item-count">
-                        {wishlist.itemCount} {t('wishlists.items')}
-                      </p>
-                    )}
                   </div>
-                  <div className="card-footer">
+                </div>
+                <div className="card-footer">
                     <button
                       className="share-icon"
                       onClick={(e) => {
@@ -181,7 +192,6 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                       <Icon name="share" size={24} />
                     </button>
                   </div>
-                </div>
               </div>
             ))}
           </div>

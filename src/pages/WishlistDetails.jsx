@@ -10,6 +10,7 @@ import { MdShare, MdImage, MdClose } from 'react-icons/md';
 import '../styles/dashboard/wishlist-details.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Icon from '../components/common/Icon/Icon';
 
 
 const WishlistDetails = () => {
@@ -41,18 +42,19 @@ const WishlistDetails = () => {
   // Fetch wishlist details and wishes
   useEffect(() => {
     const fetchData = async () => {
-      if (!currentUser || !currentUser.data.accessToken) {
-        navigate('/auth');
-        return;
-      }
+      // if (!currentUser || !currentUser.token) {
+      //   navigate('/auth');
+      //   return;
+      // }
       
       try {
         setIsLoading(true);
         
         // First, fetch wishlist metadata (we'll need to add this API endpoint)
         try {
+          console.log(currentUser);
           // If you have a separate endpoint for wishlist details, uncomment below
-          const wishlistMetadata = await wishlistService.getWishlistMetadata(id, currentUser.data.accessToken);
+          const wishlistMetadata = await wishlistService.getWishlistMetadata(id, localStorage.getItem('token'));
           console.log("Wishlist metadata:", wishlistMetadata.data)
           setWishlist(wishlistMetadata.data);
           
@@ -62,7 +64,7 @@ const WishlistDetails = () => {
         }
         
         // Fetch wishes for the wishlist
-        const wishesData = await wishlistService.getWishlistById(id, currentUser.data.accessToken);
+        const wishesData = await wishlistService.getWishlistById(id, localStorage.getItem('token'));
         
         // Check if the response has the expected structure
         if (wishesData && wishesData.data) {
@@ -140,46 +142,9 @@ const WishlistDetails = () => {
     fileInputRef.current.click();
   };
   
-  const handleAddWish = async (e) => {
-    e.preventDefault();
-    
-    if (!newWish.title.trim()) {
-      toast.error(t('wishlist.titleRequired') || 'Title is required');
-      return;
-    }
-    
-    if (isUploading) {
-      toast.warning(t('wishlist.uploadInProgress') || 'Please wait for image upload to complete');
-      return;
-    }
-    
-    try {
-      const createdWish = await wishlistService.addWishToWishlist(newWish, currentUser.data.accessToken);
-      
-      // Add the new wish to the list
-      if (createdWish && createdWish.data) {
-        setWishes(prevWishes => [...prevWishes, createdWish.data]);
-      }
-
-      // Reset the form
-      setNewWish({
-        wishListId: id,
-        title: '',
-        description: '',
-        url: '',
-        imageUrl: ''
-      });
-      setIsAddingWish(false);
-      
-      // Refresh the wish list after adding a new wish
-      const refreshedWishesData = await wishlistService.getWishlistById(id, currentUser.data.accessToken);
-      if (refreshedWishesData && refreshedWishesData.data) {
-        setWishes(refreshedWishesData.data);
-      }
-    } catch (err) {
-      console.error('Failed to add wish:', err);
-      setError(t('wishlist.failedToAddWish'));
-    }
+  // Navigate to the AddWishes page
+  const handleAddWish = () => {
+    navigate(`/addwishes/${id}`);
   };
   
   const handleGoBack = () => {
@@ -275,224 +240,48 @@ const WishlistDetails = () => {
       <header className="dashboard-header">
         <div className="header-container">
           <button onClick={handleGoBack} className="back-button">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7"></path>
-            </svg>
+            <Icon name="back" size={18} />
           </button>
-          <h1 className="wishlist-title">{wishlist.title}</h1>
-          <div className="header-actions">
-            <LanguageSelector />
+          <h3 className="body1">{wishlist.title}</h3>
+          <div className="header-actions" onClick={handleShareWishlist}>
+            <Icon name="share" size={24} />
           </div>
         </div>
       </header>
       
-      <main className="main-content">
-        <div className="wishlist-info">
-          <div className="wishlist-header-actions">
-            <span className={`visibility-badge ${wishlist.visibility.toLowerCase()}`}>
-              {wishlist.visibility === 'PUBLIC' ? t('wishlist.public') : t('wishlist.private')}
-            </span>
-            
-            {/* Share button - only enabled for PUBLIC wishlists */}
-            {wishlist.visibility === 'PUBLIC' && (
-              <div className="share-button-container">
-              <button 
-                onClick={handleShareWishlist} 
-                className="share-button"
-                aria-label="Share wishlist"
-              >
-                {t('wishlist.share') || 'Share'}
-                <MdShare size={18} /> {/* Adjusted icon size for balance */}
-              </button>
+      <main className="wishes-container">
+        <div className="wishes-grid">
+          {/* Add New Wish Card */}
+          <div className="wish-card add-wish-card" onClick={() => handleAddWish(wishlist.id)}>
+            <div className="add-wish-icon">
+              <Icon name="plus" size={16} />
             </div>
-            )}
+            <div className="caption-medium">
+              {t('wishlist.addNewGift') || 'Қалауды толықтыру'}
+            </div>
           </div>
           
-          {wishlist.description && (
-            <p className="wishlist-description">{wishlist.description}</p>
-          )}
-          <p className="wishlist-date">
-            {t('wishlist.created')}: {new Date(wishlist.createdAt).toLocaleDateString()}
-          </p>
+          {/* Display Wishes */}
+          {wishes.map((wish) => (
+            <div>
+              <div key={wish.id} className="wish-card">
+                {wish.imageUrl ? (
+                  <div className="wish-image" style={{ width: '100%', height: '100%', backgroundImage: `url(${wish.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
+                
+                  </div>
+                ) : (
+                  <div className="wish-image placeholder-image">
+                    <Icon name="gift" size={32} />
+                  </div>
+                )}
+       
+              </div>
+              <div className="subbody3">
+                  {wish.title}
+                </div>
+            </div>
+          ))}
         </div>
-        
-        <section className="section-wishlist">
-          {isAddingWish ? (
-            <div className="card">
-              <h2 className="card-title">{t('wishlist.addNewGift')}</h2>
-              <form onSubmit={handleAddWish}>
-              
-                <div className="form-group">
-                  <label htmlFor="title" className="form-label">
-                    {t('wishlist.giftTitle')}*
-                  </label>
-                  <input
-                    type="text"
-                    id="title"
-                    name="title"
-                    value={newWish.title}
-                    onChange={handleInputChange}
-                    className="form-input-wish"
-                    placeholder={t('wishlist.giftTitlePlaceholder')}
-                    required
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="description" className="form-label">
-                    {t('wishlist.description')}
-                  </label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    value={newWish.description}
-                    onChange={handleInputChange}
-                    className="form-input-wish form-textarea"
-                    placeholder={t('wishlist.giftDescriptionPlaceholder')}
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label className="form-label">
-                    {t('wishlist.image')}
-                  </label>
-                  <div className="image-upload-container">
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageChange}
-                      accept="image/*"
-                      style={{ display: 'none' }}
-                    />
-                    {selectedImage ? (
-                      <div className="image-preview">
-                        <img 
-                          src={URL.createObjectURL(selectedImage)} 
-                          alt="Preview" 
-                          className="preview-image"
-                        />
-                        <button 
-                          type="button" 
-                          className="remove-image-btn"
-                          onClick={removeImage}
-                          disabled={isUploading}
-                        >
-                          <MdClose size={20} />
-                        </button>
-                        {isUploading && (
-                          <div className="upload-progress">
-                            {t('wishlist.uploading') || 'Uploading...'}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div 
-                        className="image-upload-placeholder"
-                        onClick={triggerFileInput}
-                      >
-                        <MdImage size={32} className="upload-icon" />
-                        <span>{t('wishlist.uploadImage') || 'Upload an image'}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="url" className="form-label">
-                    {t('wishlist.url')}
-                  </label>
-                  <input
-                    type="url"
-                    id="url"
-                    name="url"
-                    value={newWish.url}
-                    onChange={handleInputChange}
-                    className="form-input-wish"
-                    placeholder={t('wishlist.urlPlaceholder')}
-                  />
-                </div>
-                
-                <div className="form-group">
-                  <label htmlFor="imageUrl" className="form-label">
-                    {t('wishlist.imageUrl')}
-                  </label>
-                  <input
-                    type="url"
-                    id="imageUrl"
-                    name="imageUrl"
-                    value={newWish.imageUrl}
-                    onChange={handleInputChange}
-                    className="form-input-wish"
-                    placeholder={t('wishlist.imageUrlPlaceholder')}
-                  />
-                </div>
-                
-                <div className="form-buttons">
-                  <button type="submit" className="btn-primary">
-                    {t('wishlist.addGift')}
-                  </button>
-                  <button 
-                    type="button" 
-                    className="btn-secondary"
-                    onClick={() => setIsAddingWish(false)}
-                  >
-                    {t('wishlist.cancel')}
-                  </button>
-                </div>
-              </form>
-            </div>
-          ) : (
-            <button 
-              onClick={() => setIsAddingWish(true)} 
-              className="add-wish-button"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              <span>{t('wishlist.addNewGift')}</span>
-            </button>
-          )}
-        </section>
-        
-        <section className="gifts-section">
-          <h2 className="section-title">{t('wishlist.gifts')}</h2>
-          {wishes.length === 0 ? (
-            <div className="empty-list">
-              <p className="empty-message">{t('wishlist.noGiftsYet')}</p>
-            </div>
-          ) : (
-            <div className="gifts-grid">
-              {wishes.map((wish) => (
-                <div key={wish.id} className="gift-item">
-                  {wish.imageUrl && (
-                    <div className="gift-image">
-                      <img src={wish.imageUrl} alt={wish.title} />
-                    </div>
-                  )}
-                  <div className="gift-content">
-                    <h3 className="gift-title">{wish.title}</h3>
-                    {wish.description && (
-                      <p className="gift-description">{wish.description}</p>
-                    )}
-                    {wish.url && (
-                      <div className="gift-link">
-                        <a 
-                          href={wish.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="link"
-                        >
-                          {t('wishlist.viewItem')}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
       </main>
     </div>
   );

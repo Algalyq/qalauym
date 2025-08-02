@@ -12,8 +12,10 @@ import QAddButton from '../components/common/Buttons/QAddButton';
 import CreateWishlistModal from '../components/common/Modals/CreateWishlistModal';
 import WishListScrollContent from '../components/common/Content/WishListScroolContent';
 import EmptyWishlistContent from '../components/common/Content/EmptyWishlistContent';
+import MobileOnlyMessage from '../components/common/MobileOnlyMessage';
 import '../styles/common/typography.css';
 import '../styles/common/modals.css';
+import '../styles/common/mobileonly.css';
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -22,7 +24,8 @@ const Dashboard = () => {
   const [wishlists, setWishlists] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+  // Mobile-only app, no need to check for mobile anymore
+
   const [newWishlist, setNewWishlist] = useState({
     title: '',
     description: '',
@@ -32,7 +35,7 @@ const Dashboard = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const menuRef = useRef(null);
-  
+
   // Load wishlists from the API when component mounts
   useEffect(() => {
     const fetchWishlists = async () => {
@@ -56,25 +59,27 @@ const Dashboard = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchWishlists();
   }, [t, navigate]);
-  
+
   // Close menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target) && 
+      if (menuRef.current && !menuRef.current.contains(event.target) &&
           !event.target.classList.contains('menu-button')) {
         setIsMenuOpen(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
+
+  // No need to check for mobile device anymore, app is mobile-only
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewWishlist(prev => ({
@@ -82,7 +87,7 @@ const Dashboard = () => {
       [name]: value
     }));
   };
-  
+
   const handleCreateWishlist = async (wishlistData) => {
     if (!wishlistData || !wishlistData.title || !wishlistData.title.trim()) {
       toast.error(t('dashboard.wishlistTitleRequired'));
@@ -95,49 +100,49 @@ const Dashboard = () => {
       navigate('/auth');
       return;
     }
-    
+
     try {
       setIsLoading(true);
       console.log('Creating wishlist with data:', wishlistData);
-      
+
       const wishlistPayload = {
         title: wishlistData.title.trim(),
         description: wishlistData.description || '',
         visibility: wishlistData.visibility || 'PUBLIC'
       };
-      
+
       console.log('Sending wishlist data:', wishlistPayload);
-      
+
       const response = await wishlistService.createWishlist(
         wishlistPayload,
         token // Using the token from localStorage
       );
-      
+
       console.log('Wishlist created:', response);
-      
+
       // The response might be the wishlist data directly or in a data property
       const createdWishlist = response.data || response;
-      
+
       if (!createdWishlist) {
         throw new Error('No wishlist data returned from server');
       }
-      
+
       // Add the new wishlist to the list
       setWishlists(prev => [createdWishlist, ...prev]);
-      
+
       // Reset the form
       setNewWishlist({ title: '', description: '', visibility: 'PUBLIC' });
-      
+
       // Close the modal
       closeModal();
-      
+
       // Show success notification
       toast.success(t('dashboard.wishlistCreatedSuccessfully'));
-      
+
       // Store the newly created wishlist in localStorage
       if (createdWishlist.id) {
         localStorage.setItem('recentWishlist', JSON.stringify(createdWishlist));
-        
+
       }
     } catch (err) {
       console.error('Failed to create wishlist:', err);
@@ -146,7 +151,7 @@ const Dashboard = () => {
       setIsLoading(false);
     }
   };
-  
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
@@ -166,25 +171,27 @@ const Dashboard = () => {
         draggable
         pauseOnHover
       />
-      
+
+      {/* Mobile-only components */}
       {hasWishlists ? (
-        <WishListScrollContent 
-          wishlists={wishlists} 
+        <WishListScrollContent
+          wishlists={wishlists}
           onSelectWishlist={(wishlist) => {
             // Handle wishlist selection if needed
-            console.log('Selected wishlist:', wishlist);
+            navigate(`/wishlist/${wishlist.id}`);
           }}
           onCreateWishlist={openModal}
+          onShareWishlist={(wishlist) => { /* handle share logic */ }}
         />
       ) : (
         <EmptyWishlistContent />
       )}
 
-      {/* Keep the create button visible in both states */}
+      {/* QAddButton and Navbar for mobile dashboard */}
       <div className="create-wishlist-section">
         <QAddButton onClick={openModal} />
       </div>
-
+      <Navbar />
       <CreateWishlistModal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -192,8 +199,10 @@ const Dashboard = () => {
         onInputChange={handleInputChange}
         onSubmit={handleCreateWishlist}
       />
+        
+    
 
-      <Navbar />
+
     </div>
   );
 };
