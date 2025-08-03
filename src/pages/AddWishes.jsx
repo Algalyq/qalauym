@@ -137,7 +137,7 @@ const AddWishes = () => {
       />
       <header className="wishlist-header">
         <div className="back-button" onClick={handleGoBack}>
-          <MdArrowBack size={24} />
+          <Icon name="back" size={18} />
         </div>
         <h1>{t('wishlist.addNewGift') || 'Қалауды толықтыру'}</h1>
       </header>

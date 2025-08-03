@@ -21,7 +21,7 @@ i18n
         translation: ruTranslations
       }
     },
-    fallbackLng: 'ru', // Use Russian as fallback
+    fallbackLng: 'kz', // Use Kazakh as fallback
     supportedLngs: ['kz', 'ru'], // Only support Kazakh and Russian
     interpolation: {
       escapeValue: false // React already escapes values

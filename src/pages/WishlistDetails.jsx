@@ -8,9 +8,11 @@ import LanguageSelector from '../components/common/LanguageSelector';
 import Toast from '../components/common/Toast';
 import { MdShare, MdImage, MdClose } from 'react-icons/md';
 import '../styles/dashboard/wishlist-details.css';
+import '../styles/common/loading.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Icon from '../components/common/Icon/Icon';
+import WishDetailModal from '../components/modals/WishDetailModal';
 
 
 const WishlistDetails = () => {
@@ -24,6 +26,8 @@ const WishlistDetails = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showRetry, setShowRetry] = useState(false);
+  const [selectedWishId, setSelectedWishId] = useState(null);
+  const [isWishModalOpen, setIsWishModalOpen] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   
@@ -55,7 +59,6 @@ const WishlistDetails = () => {
           console.log(currentUser);
           // If you have a separate endpoint for wishlist details, uncomment below
           const wishlistMetadata = await wishlistService.getWishlistMetadata(id, localStorage.getItem('token'));
-          console.log("Wishlist metadata:", wishlistMetadata.data)
           setWishlist(wishlistMetadata.data);
           
         } catch (metadataErr) {
@@ -68,7 +71,6 @@ const WishlistDetails = () => {
         
         // Check if the response has the expected structure
         if (wishesData && wishesData.data) {
-          console.log('Wishes data:', wishesData.data);
           setWishes(wishesData.data); // This now correctly contains the array of wishes
         } else {
           // If no wishes in response, set empty array
@@ -144,11 +146,26 @@ const WishlistDetails = () => {
   
   // Navigate to the AddWishes page
   const handleAddWish = () => {
-    navigate(`/addwishes/${id}`);
+    setIsAddingWish(true);
+    navigate(`/add-wishes/${id}`);
   };
-  
+
   const handleGoBack = () => {
     navigate('/dashboard');
+  };
+
+  // Handle click on wish card to show details modal
+  const handleWishClick = (wishId) => {
+    console.log('Wish clicked:', wishId);
+    setSelectedWishId(wishId);
+    setIsWishModalOpen(true);
+  };
+
+  // Close wish detail modal
+  const closeWishModal = () => {
+    setIsWishModalOpen(false);
+    // Reset selected wish after modal is closed with slight delay
+    setTimeout(() => setSelectedWishId(null), 300);
   };
   
   const handleShareWishlist = () => {
@@ -192,9 +209,10 @@ const WishlistDetails = () => {
   if (isLoading) {
     return (
       <div className="loading-container">
-        <p>{t('wishlist.loading')}</p>
+        <div className="spinner"></div>
+        <p className="loading-text">{t('wishlist.loading')}</p>
         {showRetry && (
-          <button onClick={handleRetry} className="btn-primary">
+          <button onClick={handleRetry} className="retry-button">
             {t('wishlist.retry')}
           </button>
         )}
@@ -205,6 +223,7 @@ const WishlistDetails = () => {
   if (error) {
     return (
       <div className="error-container">
+        <div className="error-icon">⚠️</div>
         <p className="error-message">{error}</p>
         <button onClick={handleGoBack} className="btn-primary">
           {t('wishlist.backToDashboard')}
@@ -263,8 +282,8 @@ const WishlistDetails = () => {
           
           {/* Display Wishes */}
           {wishes.map((wish) => (
-            <div>
-              <div key={wish.id} className="wish-card">
+            <div key={wish.id} className="wish-item" onClick={() => handleWishClick(wish.id)}>
+              <div className="wish-card">
                 {wish.imageUrl ? (
                   <div className="wish-image" style={{ width: '100%', height: '100%', backgroundImage: `url(${wish.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
                 
@@ -277,12 +296,19 @@ const WishlistDetails = () => {
        
               </div>
               <div className="subbody3">
-                  {wish.title}
-                </div>
+                {wish.title}
+              </div>
             </div>
           ))}
         </div>
       </main>
+
+      {/* Wish Detail Modal */}
+      <WishDetailModal 
+        wishId={selectedWishId}
+        isOpen={isWishModalOpen}
+        onClose={closeWishModal}
+      />
     </div>
   );
 };

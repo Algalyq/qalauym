@@ -8,6 +8,10 @@
     flex-direction: column;
     background-color: #ffffff;
   }
+
+  .caption-medium{
+    text-align: center;
+  }
   
   /* Header */
   .wishlist-header {
@@ -18,7 +22,6 @@
     top: 0;
     background-color: #FFFFFF;
     z-index: 10;
-    border-bottom: 1px solid #f0f0f0;
   }
   
   .wishlist-header h1 {

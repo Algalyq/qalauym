@@ -89,6 +89,21 @@ export const wishlistService = {
     }
   },
 
+  // Get a wish detail by ID
+  getWishDetail: async (wishId, token) => {
+    try {
+      const response = await api.get(`/wishes/${wishId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Get wish detail error:', error);
+      throw error;
+    }
+  },
+
 };
 
 export default wishlistService;

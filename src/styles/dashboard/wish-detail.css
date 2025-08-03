@@ -1,0 +1,306 @@
+WishDetail.css
+.wish-detail-container {
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Header */
+.wish-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid #f0f0f0;
+  position: relative;
+}
+
+.wish-detail-title {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  text-align: center;
+  flex-grow: 1;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.back-button, .share-button {
+  background: transparent;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Main content */
+.wish-detail-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Image */
+.wish-detail-image {
+  width: 100%;
+  height: 240px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.wish-detail-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.no-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background-color: #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
+
+/* Wish information */
+.wish-detail-info {
+  padding: 0 20px;
+  margin-top: -8px;
+}
+
+.wish-name {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 24px;
+  margin: 0 0 12px 0;
+  color: #111827;
+}
+
+.wish-price {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 20px;
+  margin: 0 0 16px 0;
+  color: #111827;
+  position: relative;
+}
+
+.wish-description {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0 0 24px 0;
+  white-space: pre-wrap;
+}
+
+/* Bottom link button */
+.view-link-button {
+  background-color: transparent;
+  color: #0085FF;
+  border: none;
+  border-radius: 0;
+  padding: 10px 16px;
+  font-family: 'Mulish', sans-serif;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.link-arrow {
+  font-size: 18px;
+}
+
+/* Modal Overlay */
+.modal-overlay-detail {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+}
+
+/* Modal */
+.wish-detail-modal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-radius: 20px 20px 0 0;
+  max-height: 85vh;
+  overflow-y: auto;
+  transform: translateY(100%);
+  transition: transform 0.3s ease-out;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  animation: slide-up 0.3s forwards;
+  -webkit-overflow-scrolling: touch; /* For smoother scrolling on iOS */
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* Modal Header */
+.wish-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.wish-title {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 700;
+  font-size: 18px;
+  margin: 0;
+  color: #000000;
+  text-align: center;
+}
+
+.menu-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #4b5563;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.menu-button:hover {
+  color: #111827;
+}
+
+/* Modal Content */
+.modal-content-detail {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Modal Loading */
+.modal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+}
+
+/* Modal Error */
+.modal-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+}
+
+/* Wish modal components */
+
+
+.wish-modal-image-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+  width: 100%;
+}
+
+.wish-modal-image {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+
+.wish-modal-description {
+  font-family: 'Mulish', sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #000000;
+  margin: 0 0 15px 0;
+  white-space: pre-wrap;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 512px) {
+  .wish-detail-image {
+    height: 300px;
+  }
+  
+  /* Center the image as shown in the design */
+  .wish-detail-content {
+    align-items: center;
+  }
+  
+  .wish-detail-info {
+    width: 100%;
+    max-width: 400px;
+  }
+}
+
+/* Price range style as shown in the screenshot */
+.price-range {
+  font-family: 'Mulish', system-ui;
+  font-weight: 500;
+  font-size: 18px;
+  color: #111827;
+}
+
+/* Mobile bottom browser bar styling to match the screenshot */
+.mobile-browser-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #f9fafb;
+  border-top: 1px solid #e5e7eb;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.url-display {
+  flex-grow: 1;
+  text-align: center;
+  font-family: 'Mulish', sans-serif;
+  font-size: 14px;
+  color: #6b7280;
+}

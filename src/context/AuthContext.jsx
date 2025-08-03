@@ -10,7 +10,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   // Login function that can be used for both email/password and OAuth
-// Login function that can be used for both email/password and OAuth
 const login = async (usernameOrData, password, isOAuth = false) => {
   try {
     let user;

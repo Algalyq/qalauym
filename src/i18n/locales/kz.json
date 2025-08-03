@@ -64,6 +64,7 @@
     "wishlistCreatedSuccessfully": "Тілектер тізімі сәтті құрылды!"
   },
   "wishlist": {
+    "retry":"Қайталау",
     "loading": "Тілектер тобы жүктелуде...",
     "notFound": "Тілектер тобы табылмады",
     "backToDashboard": "Басты бетке оралу",
@@ -102,5 +103,8 @@
   },
   "wishlists": {
     "title": "Тізімдер"
+  },
+  "wish": {
+    "viewLink": "Сілтемеге өту"
   }
 }

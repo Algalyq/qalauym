@@ -64,6 +64,7 @@
     "wishlistCreatedSuccessfully": "Группа желаний успешно создана!"
   },
   "wishlist": {
+    "retry":"Повторить попытку",
     "loading": "Загрузка группы желаний...",
     "notFound": "Группа желаний не найдена",
     "backToDashboard": "Вернуться на главную",
@@ -102,5 +103,8 @@
   },
   "wishlists": {
     "title": "Список"
+  },
+  "wish": {
+    "viewLink": "Перейти по ссылке"
   }
 }

@@ -10,7 +10,7 @@ import EditIcon from '../../../assets/icons/edit.svg';
 import EditIcon2 from '../../../assets/icons/edit2.svg';
 import ShareIcon from '../../../assets/icons/share.svg';
 import BackIcon from '../../../assets/icons/back.svg';
-import AddWishes from '../../../pages/AddWishes';
+import VectorIcon from '../../../assets/icons/vectorIcon.svg';
 // Map icon names to their corresponding SVG URLs
 const iconUrls = {
   home: HomeIcon,
@@ -21,7 +21,7 @@ const iconUrls = {
   edit2: EditIcon2,
   share: ShareIcon,
   back: BackIcon,
-  addWishes: AddWishes,
+  vector: VectorIcon,
 };
 
 const Icon = ({ name, size = 24, className = '', style = {}, ...props }) => {

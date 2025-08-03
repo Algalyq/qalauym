@@ -9,7 +9,7 @@ const LanguageSelector = () => {
     i18nInstance.changeLanguage(lng);
   };
 
-  const currentLanguage = i18nInstance.language || 'ru';
+  const currentLanguage = i18nInstance.language || 'kz';
   const isRuOrKz = currentLanguage === 'ru' || currentLanguage === 'kz';
   
   return (

@@ -83,7 +83,7 @@ function AppContent() {
             <WishlistDetails />
           </ProtectedRoute>
         } />
-        <Route path="/addwishes/:id" element={
+        <Route path="/add-wishes/:id" element={
           <ProtectedRoute>
             <AddWishes />
           </ProtectedRoute>
