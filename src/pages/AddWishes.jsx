@@ -14,7 +14,7 @@ import addWishes from '../assets/icons/add_img_wishes.svg';
 const AddWishes = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { id } = useParams(); // Wishlist ID from URL
+  const { id } = useParams(); 
   const fileInputRef = useRef(null);
   
   const [wish, setWish] = useState({
@@ -29,7 +29,28 @@ const AddWishes = () => {
   const [selectedImageURL, setSelectedImageURL] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [wishTitle, setWishTitle] = useState('BIRTHDAY WISHES');
+  const [wishTitle, setWishTitle] = useState('');
+
+  // Fetch wishlist metadata to get title
+  useEffect(() => {
+    const fetchWishlistMetadata = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await wishlistService.getWishlistMetadata(id, token);
+        
+        // Extract title from response
+        if (response && response.data && response.data.title) {
+          setWishTitle(response.data.title);
+        }
+      } catch (error) {
+        console.error('Error fetching wishlist metadata:', error);
+      }
+    };
+
+    if (id) {
+      fetchWishlistMetadata();
+    }
+  }, [id]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -135,11 +156,11 @@ const AddWishes = () => {
         draggable
         pauseOnHover
       />
-      <header className="wishlist-header">
+      <header className="wishlist-header-wishes">
         <div className="back-button" onClick={handleGoBack}>
           <Icon name="back" size={18} />
         </div>
-        <h1>{t('wishlist.addNewGift') || 'Қалауды толықтыру'}</h1>
+        <h1>{t('wishlist.addNewGift')}</h1>
       </header>
 
       <main className="add-wish-form">
@@ -198,7 +219,7 @@ const AddWishes = () => {
         <form onSubmit={handleSubmit}>
           <div className="form-field">
             <label htmlFor="title">
-              {t('wishlist.giftTitle') || 'Сыйлықтың атауы'}
+              {t('wishlist.giftTitle')}
             </label>
             <input
               type="text"
@@ -213,7 +234,7 @@ const AddWishes = () => {
 
           <div className="form-field">
             <label htmlFor="price">
-              {t('wishlist.price') || 'Бағасы'}
+              {t('wishlist.price')}
             </label>
             <input
               type="text"
@@ -227,13 +248,13 @@ const AddWishes = () => {
 
           <div className="form-field">
             <label htmlFor="url">
-              {t('wishlist.url') || 'Сілтеме'}
+              {t('wishlist.url')}
             </label>
             <input
               type="url"
               id="url"
               name="url"
-              placeholder="https://www.apple.com/kz/apple-watch-se/"
+              placeholder={t('wishlist.urlPlaceholder')}
               value={wish.url}
               onChange={handleInputChange}
             />
@@ -241,12 +262,12 @@ const AddWishes = () => {
 
           <div className="form-field">
             <label htmlFor="description">
-              {t('wishlist.description') || 'Сипаттама (қандай өлшемдер)'}
+              {t('wishlist.description')}
             </label>
             <textarea
               id="description"
               name="description"
-              placeholder="Apple Watch Series 9, 41 мм, GPS (cellular қажет емес). Алюминий корпус, ақ бау. Және нұсқасы болса жақсы."
+              placeholder={t('wishlist.descriptionPlaceholder')}
               value={wish.description}
               onChange={handleInputChange}
             />

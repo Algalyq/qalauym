@@ -15,27 +15,30 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Sample data if no wishlists provided
+  // Use the provided wishlists or an empty array
   const sampleWishlists = wishlists.length > 0 ? wishlists : [];
 
-  // Fixed card width for mobile, adjust for desktop
-  const cardWidth = 300;
   const isMobile = window.innerWidth <= 512;
 
-  // Scroll to index (only for mobile)
   const scrollToIndex = useCallback((index) => {
     if (!scrollContainerRef.current || !isMobile) return;
 
     const container = scrollContainerRef.current;
-    const targetScrollLeft = index * cardWidth;
-    container.scrollTo({
-      left: targetScrollLeft,
-      behavior: 'smooth',
-    });
-    setCurrentIndex(index);
-  }, [cardWidth, isMobile]);
+    const cardElement = container.children[index];
+    if (cardElement) {
+        // Calculate the scroll position to center the card
+        const cardRect = cardElement.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const scrollPosition = cardRect.left - containerRect.left + container.scrollLeft - (containerRect.width / 2) + (cardRect.width / 2);
+        
+        container.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth',
+        });
+        setCurrentIndex(index);
+    }
+  }, [isMobile]);
 
-  // Drag handlers (only for mobile) with reduced sensitivity
   const handleMouseDown = useCallback((e) => {
     if (!isMobile || !scrollContainerRef.current) return;
     setIsDragging(true);
@@ -48,25 +51,16 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     if (!isMobile || !isDragging || !scrollContainerRef.current) return;
     e.preventDefault();
     const x = e.pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 1.0; // Reduced from 1.5 to 1.0 for easier swipe
+    const walk = (x - startX) * 1.0;
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   }, [isMobile, isDragging, startX, scrollLeft]);
 
   const handleMouseUp = useCallback(() => {
     if (!isMobile || !isDragging) return;
     setIsDragging(false);
-    setTimeout(() => {
-      if (scrollContainerRef.current) {
-        const container = scrollContainerRef.current;
-        const scrollLeft = container.scrollLeft;
-        const nearestIndex = Math.round(scrollLeft / cardWidth);
-        const clampedIndex = Math.max(0, Math.min(nearestIndex, sampleWishlists.length - 1));
-        scrollToIndex(clampedIndex);
-      }
-    }, 100);
-  }, [isMobile, isDragging, scrollToIndex, sampleWishlists.length, cardWidth]);
+    // The scroll listener will handle updating the active index
+  }, [isMobile, isDragging]);
 
-  // Touch handlers (only for mobile) with reduced sensitivity
   const handleTouchStart = useCallback((e) => {
     if (!isMobile || !scrollContainerRef.current) return;
     setIsDragging(true);
@@ -77,7 +71,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
   const handleTouchMove = useCallback((e) => {
     if (!isMobile || !isDragging || !scrollContainerRef.current) return;
     const x = e.touches[0].pageX - scrollContainerRef.current.offsetLeft;
-    const walk = (x - startX) * 0.8; // Reduced from 1.2 to 0.8 for easier swipe
+    const walk = (x - startX) * 0.8;
     scrollContainerRef.current.scrollLeft = scrollLeft - walk;
   }, [isMobile, isDragging, startX, scrollLeft]);
 
@@ -85,7 +79,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     handleMouseUp();
   }, [handleMouseUp]);
 
-  // Scroll listener (only for mobile)
+  // The corrected scroll listener to find the card closest to the center
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container || !isMobile) return;
@@ -94,23 +88,24 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
-          const scrollLeft = container.scrollLeft;
-          const containerWidth = container.clientWidth;
-          const scrollWidth = container.scrollWidth;
-          
-          // Check if we're close to the end of the scroll area
-          const isNearEnd = scrollLeft + containerWidth >= scrollWidth - 20;
-          
-          if (isNearEnd) {
-            // If near the end, set the last item as active
-            setCurrentIndex(sampleWishlists.length - 1);
-          } else {
-            // Otherwise use the standard calculation
-            const newIndex = Math.round(scrollLeft / cardWidth);
-            const clampedIndex = Math.max(0, Math.min(newIndex, sampleWishlists.length - 1));
-            setCurrentIndex(clampedIndex);
-          }
-          
+          const containerRect = container.getBoundingClientRect();
+          const containerCenterX = containerRect.left + containerRect.width / 2;
+
+          let closestCardIndex = 0;
+          let minDistance = Infinity;
+
+          Array.from(container.children).forEach((child, index) => {
+            const cardRect = child.getBoundingClientRect();
+            const cardCenterX = cardRect.left + cardRect.width / 2;
+            const distance = Math.abs(cardCenterX - containerCenterX);
+
+            if (distance < minDistance) {
+              minDistance = distance;
+              closestCardIndex = index;
+            }
+          });
+
+          setCurrentIndex(closestCardIndex);
           ticking = false;
         });
         ticking = true;
@@ -118,12 +113,12 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
+    // Scroll to the first item on initial render
     setTimeout(() => scrollToIndex(0), 100);
 
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [isMobile, scrollToIndex, sampleWishlists.length, cardWidth]);
+  }, [isMobile, scrollToIndex]);
 
-  // Keyboard navigation (optional for desktop)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (isMobile && e.key === 'ArrowLeft' && currentIndex > 0) {
@@ -166,10 +161,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                   !isMobile && index === currentIndex ? 'focused' : ''
                 }`}
                 onClick={() => {
-                  // Navigate directly to wishlist details page without token check
                   navigate(`/wishlist/${wishlist.id}`);
-                  
-                  // Call the original onSelectWishlist handler if provided
                   if (onSelectWishlist) onSelectWishlist(wishlist);
                 }}
                 tabIndex={index === currentIndex ? 0 : -1}
