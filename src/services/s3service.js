@@ -34,7 +34,13 @@ const uploadImage = async (fileObj, type = 'wish') => {
   try {
     // Extract the file from the object
     const file = fileObj.file || fileObj;
-    
+    // Add this to the top of uploadImage function
+    console.log('S3 Config:', {
+      region: VITE_AWS_REGION,
+      bucket: VITE_S3_BUCKET_NAME,
+      hasAccessKey: !!VITE_AWS_ACCESS_KEY_ID,
+      hasSecretKey: !!VITE_AWS_SECRET_ACCESS_KEY
+    });
     // Determine the upload path based on type
     const folder = type === 'avatar' ? 'ava/' : 'wish_img/';
     const fileName = `${
@@ -68,9 +74,15 @@ const uploadImage = async (fileObj, type = 'wish') => {
       fileName,
     };
   } catch (error) {
-    console.error('Error uploading file:', error);
-    throw error;
-  }
+      console.error('Error uploading file:', error);
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        name: error.name,
+        stack: error.stack
+      });
+      throw error;
+    }
 };
 
 /**
