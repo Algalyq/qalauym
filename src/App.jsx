@@ -7,6 +7,7 @@ import WishlistDetails from './pages/WishlistDetails';
 import SharedWishlist from './pages/SharedWishlist';
 import AddWishes from './pages/AddWishes';
 import OAuthCallback from './pages/OAuthCallback';
+import Profile from './pages/Profile';
 import { isTokenExpired } from './utils/authUtils';
 import MobileOnlyMessage from './components/common/MobileOnlyMessage';
 import './styles/common/mobileonly.css';
@@ -14,7 +15,7 @@ import './styles/common/mobileonly.css';
 const ProtectedRoute = ({ children }) => {
   const token = localStorage.getItem('token');
   // Check if token doesn't exist OR if it exists but is expired
-  if (!token && !isTokenExpired(token)) {
+  if (!token || (token && isTokenExpired(token))) {
     return <Navigate to="/auth" replace />;
   }
   return children;
@@ -35,7 +36,7 @@ function AppContent() {
   const token = localStorage.getItem('token');
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 512);
   // Check if token doesn't exist OR if it exists but is expired
-  const isTrue = (!token && !isTokenExpired(token));
+  const isTrue = (!token || (token && isTokenExpired(token)));
   
   // Check if device is mobile
   useEffect(() => {
@@ -86,6 +87,11 @@ function AppContent() {
         <Route path="/add-wishes/:id" element={
           <ProtectedRoute>
             <AddWishes />
+          </ProtectedRoute>
+        } />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <Profile />
           </ProtectedRoute>
         } />
         {/* Public route for shared wishlists - no authentication required */}

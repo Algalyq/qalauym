@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  baseURL: 'https://api.qalauym.kz',
-  // baseURL: 'http://localhost:8080',
+  // baseURL: 'https://qalauym-api.onrender.com',
+  baseURL: 'http://94.131.89.67:8080',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'
@@ -196,6 +196,17 @@ export const authService = {
       console.error('Google OAuth error:', error);
       throw error;
     }
+  }
+};
+
+// Update user profile
+export const updateProfile = async (profileData) => {
+  try {
+    const response = await api.put('/user/profile', profileData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    throw error;
   }
 };
 

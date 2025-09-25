@@ -5,6 +5,7 @@ import '../../../styles/common/typography.css';
 import '../../../styles/dashboard/wishlistscrollcontent.css';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Icon from '../Icon/Icon';
+import backgroundImage from '../../../assets/images/url_collage_test.jpg';
 
 const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishlist, onShareWishlist }) => {
   const navigate = useNavigate();
@@ -160,6 +161,12 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                 className={`wishlist-card-scroll ${index === currentIndex ? 'active' : ''} ${
                   !isMobile && index === currentIndex ? 'focused' : ''
                 }`}
+                style={{
+                  backgroundImage: `url(${backgroundImage})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat'
+                }}
                 onClick={() => {
                   navigate(`/wishlist/${wishlist.id}`);
                   if (onSelectWishlist) onSelectWishlist(wishlist);
