@@ -64,6 +64,39 @@ export const wishlistService = {
     }
   },
 
+  getWishlistImages: async (wishlistId, token) => {
+    try {
+      const response = await api.get(`/wishes/images/${wishlistId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      // The API response body contains a 'data' property which is the array of URLs
+      return response.data.data;
+    } catch (error) {
+      console.error('Get wishlist images error:', error);
+      throw error;
+    }
+  },
+
+  updateWishlistImage: async (wishlistId, imageUrl, token) => {
+    try {
+      const response = await api.patch(`/wishlists/image`, {
+        wishlistId,
+        imageUrl
+      }, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Update wishlist image error:', error);
+      throw error;
+    }
+  },
+
   getWishlistMetadata: async (wishlistId, token) => {
     try {
       const response = await api.get(`/wishlists/${wishlistId}`, {

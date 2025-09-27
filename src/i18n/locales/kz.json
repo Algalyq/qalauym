@@ -118,6 +118,7 @@
     "username": "Пайдаланушы аты",
     "email": "Электрондық пошта",
     "birthday": "Туған күні",
+    "phone": "Телефон",
     "shippingAddress": "Жеткізу мекенжайы",
     "enterShippingAddress": "Жеткізу мекенжайын енгізіңіз",
     "saveChanges": "Өзгерістерді сақтау",

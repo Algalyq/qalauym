@@ -57,19 +57,6 @@ const Profile = () => {
 
   const showTextAvatar = !profile.avatarUrl;
 
-  const getBirthdayInfo = (dob) => {
-    if (!dob) return t('profile.notProvided');
-    const birthday = new Date(dob);
-    const today = new Date();
-    birthday.setFullYear(today.getFullYear());
-    if (birthday < today) {
-      birthday.setFullYear(today.getFullYear() + 1);
-    }
-    const diffDays = Math.ceil(Math.abs(birthday - today) / (1000 * 60 * 60 * 24));
-    const month = birthday.toLocaleString('en-US', { month: 'short' });
-    const day = birthday.getDate();
-    return `${month} ${day} ${t('profile.inDays', { count: diffDays })}`;
-  };
 
   return (
     <div className="profilePage">
@@ -119,7 +106,7 @@ const Profile = () => {
         <div className="aboutSection">
           <h2>{t('profile.aboutMe')}</h2>
           <div className="aboutDetails">
-            <div><span>{t('profile.birthday')}:</span> {getBirthdayInfo(profile.birthday)}</div>
+            <div><span>{t('profile.birthday')}:</span> {profile.birthday}</div>
             <div><span>{t('profile.phoneNumber')}:</span> {profile.phone || t('profile.notProvided')}</div>
           </div>
         </div>

@@ -10,6 +10,8 @@ import '../styles/dashboard/add-wishes.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import addWishes from '../assets/icons/add_img_wishes.svg';
+import collageService from '../services/collageService';
+
 
 const AddWishes = () => {
   const { t } = useTranslation();
@@ -86,6 +88,9 @@ const AddWishes = () => {
         ...prev,
         imageUrl: result.url
       }));
+
+      const token = localStorage.getItem('token');
+      await collageService.generateAndUpdateCollage(id, token);
       setIsUploading(false);
     } catch (error) {
       console.error('Error uploading image:', error);

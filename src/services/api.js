@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // Create axios instance with base URL
 const api = axios.create({
-  // baseURL: 'https://qalauym-api.onrender.com',
-  baseURL: 'http://94.131.89.67:8080',
+  baseURL: 'http://localhost:8080',
+  // baseURL: 'http://94.131.89.67:8080',
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json'

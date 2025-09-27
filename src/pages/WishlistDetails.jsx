@@ -286,7 +286,6 @@ const WishlistDetails = () => {
               <div className="wish-card">
                 {wish.imageUrl ? (
                   <div className="wish-image" style={{ width: '100%', height: '100%', backgroundImage: `url(${wish.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}>
-                
                   </div>
                 ) : (
                   <div className="wish-image placeholder-image">

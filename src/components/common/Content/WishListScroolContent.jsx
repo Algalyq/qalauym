@@ -5,7 +5,6 @@ import '../../../styles/common/typography.css';
 import '../../../styles/dashboard/wishlistscrollcontent.css';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Icon from '../Icon/Icon';
-import backgroundImage from '../../../assets/images/url_collage_test.jpg';
 
 const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishlist, onShareWishlist }) => {
   const navigate = useNavigate();
@@ -162,7 +161,7 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                   !isMobile && index === currentIndex ? 'focused' : ''
                 }`}
                 style={{
-                  backgroundImage: `url(${backgroundImage})`,
+                  backgroundImage: `url(${wishlist.imageUrl})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
                   backgroundRepeat: 'no-repeat'

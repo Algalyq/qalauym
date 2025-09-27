@@ -38,8 +38,7 @@ const login = async (usernameOrData, password, isOAuth = false) => {
       const response = await authService.register(userData);
       // Store user data in localStorage
       const user = { ...userData, ...response };
-      localStorage.setItem('profile', JSON.stringify(user));
-      localStorage.setItem('token', response.token || response.accessToken || '');
+      localStorage.setItem('token', response.data.token || response.data.accessToken || '');
       setCurrentUser(user);
       return user;
     } catch (error) {

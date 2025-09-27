@@ -5,6 +5,9 @@ import LanguageSelector from '../common/LanguageSelector';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { FcGoogle } from 'react-icons/fc';
 import '../../styles/auth/register-form.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 
 const RegisterForm = ({ onToggleForm }) => {
   const { t, i18n } = useTranslation();
@@ -12,12 +15,13 @@ const RegisterForm = ({ onToggleForm }) => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [birthday, setBirthday] = useState('');
-  const [gender, setGender] = useState('M');
+  const [gender, setGender] = useState('MALE');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
+  const navigate = useNavigate();
   const { register } = useAuth();
   
   // Check if current language is Russian or Kazakh
@@ -46,6 +50,8 @@ const RegisterForm = ({ onToggleForm }) => {
         gender
       };
       await register(userData);
+
+      navigate('/dashboard');
       // Registration successful, no need to redirect as the AuthContext will handle the user state
     } catch (err) {
       setError(t('auth.errors.failedToRegister'));
@@ -150,13 +156,19 @@ const RegisterForm = ({ onToggleForm }) => {
               {t('auth.birthday')}
             </label>
             <div className="input-container">
-              <input
-                id="birthday"
-                type="date"
-                value={birthday}
-                onChange={(e) => setBirthday(e.target.value)}
-                className={`form-input ${isRuOrKz ? 'ru-kz' : ''}`}
-              />
+            <DatePicker
+            id="birthday"
+            // This prop controls the display format
+            dateFormat="dd/MM/yyyy" 
+            // The selected date is the Date object from state
+            selected={birthday} 
+            // onChange gives you the new Date object
+            onChange={(date) => setBirthday(date)} 
+            className={`form-input ${isRuOrKz ? 'ru-kz' : ''}`}
+            placeholderText="дд/мм/гггг" // Optional placeholder
+            showYearDropdown // Optional: Adds a dropdown for years
+            scrollableYearDropdown // Optional: Makes the year dropdown scrollable
+          />
             </div>
           </div>
           
@@ -173,8 +185,8 @@ const RegisterForm = ({ onToggleForm }) => {
                 onChange={(e) => setGender(e.target.value)}
                 className={`form-select ${isRuOrKz ? 'ru-kz' : ''}`}
               >
-                <option value="M">{t('auth.male')}</option>
-                <option value="F">{t('auth.female')}</option>
+                <option value="MALE">{t('auth.male')}</option>
+                <option value="FEMALE">{t('auth.female')}</option>
               </select>
             </div>
           </div>
