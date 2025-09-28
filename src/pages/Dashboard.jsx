@@ -49,7 +49,6 @@ const Dashboard = () => {
       try {
         setIsLoading(true);
         const data = await wishlistService.getUserWishlists(token);
-        console.log('Fetched wishlists:', data);
         setWishlists(data.data || []);
         setError(null);
       } catch (err) {

@@ -5,6 +5,7 @@ import '../../../styles/common/typography.css';
 import '../../../styles/dashboard/wishlistscrollcontent.css';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import Icon from '../Icon/Icon';
+import { MdClose } from 'react-icons/md'; // Import the close icon
 
 const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishlist, onShareWishlist }) => {
   const navigate = useNavigate();
@@ -14,11 +15,19 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
+  
+  // 1. NEW STATE: State to manage the full-screen share preview
+  const [isFullscreenPreviewOpen, setIsFullscreenPreviewOpen] = useState(false);
 
   // Use the provided wishlists or an empty array
   const sampleWishlists = wishlists.length > 0 ? wishlists : [];
+  
+  // Get the currently active wishlist object
+  const activeWishlist = sampleWishlists[currentIndex];
 
   const isMobile = window.innerWidth <= 512;
+
+  // --- Scroll Logic (Unchanged) ---
 
   const scrollToIndex = useCallback((index) => {
     if (!scrollContainerRef.current || !isMobile) return;
@@ -58,7 +67,6 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
   const handleMouseUp = useCallback(() => {
     if (!isMobile || !isDragging) return;
     setIsDragging(false);
-    // The scroll listener will handle updating the active index
   }, [isMobile, isDragging]);
 
   const handleTouchStart = useCallback((e) => {
@@ -79,7 +87,6 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     handleMouseUp();
   }, [handleMouseUp]);
 
-  // The corrected scroll listener to find the card closest to the center
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container || !isMobile) return;
@@ -113,7 +120,6 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     };
 
     container.addEventListener('scroll', handleScroll, { passive: true });
-    // Scroll to the first item on initial render
     setTimeout(() => scrollToIndex(0), 100);
 
     return () => container.removeEventListener('scroll', handleScroll);
@@ -133,8 +139,80 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, sampleWishlists.length, scrollToIndex, isMobile]);
 
+  // --- NEW: Share Preview Handlers ---
+
+  // 2. Modified handler to open the preview
+  const handleShareClick = (e, wishlist) => {
+    e.stopPropagation();
+    // Only open the preview if there's an active wishlist
+    if (wishlist) {
+        setIsFullscreenPreviewOpen(true);
+    }
+  };
+
+  // 3. Final share handler called from within the fullscreen preview
+  const handleFinalShare = (wishlist) => {
+      setIsFullscreenPreviewOpen(false); // Close preview
+      if (onShareWishlist) {
+          onShareWishlist(wishlist); // Execute the actual share logic
+      }
+  };
+
+  // 4. NEW: Fullscreen Preview Component
+  const FullscreenSharePreview = ({ wishlist }) => (
+    <div className="fullscreen-share-preview-overlay">
+      <div className="fullscreen-preview-header">
+          {/* Close Button */}
+          <button 
+              onClick={() => setIsFullscreenPreviewOpen(false)} 
+              className="preview-close-btn"
+              aria-label={t('common.close') || 'Close'}
+          >
+              <MdClose size={28} />
+          </button>
+          {/* Custom Title */}
+          <h2 className="preview-title">{t('wish.fullScreenTitle') || 'Wishlist Share Preview'}</h2>
+          
+          {/* Share Button (Optional, can be placed at bottom too) */}
+          <button 
+            onClick={() => handleFinalShare(wishlist)} 
+            className="preview-share-btn"
+          >
+             {t('common.share') || 'Share'}
+          </button>
+      </div>
+
+      <div className="preview-content-container">
+          {/* The replicated wishlist card content */}
+          <div 
+              className="wishlist-card-scroll active fullscreen-card"
+              style={{
+                  backgroundImage: `image-set(url(${wishlist.imageUrl}) 1x, url(${wishlist.imageUrl}) 2x)`,
+                  WebkitBackgroundImage: `-webkit-image-set(url(${wishlist.imageUrl}) 1x, url(${wishlist.imageUrl}) 2x)`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                  imageRendering: 'auto',
+              }}
+          >
+              <div className="card-content">
+                  <div className="card-body">
+                      <h3 className="wishlist-title-scroll">{wishlist.title}</h3>
+                  </div>
+              </div>
+          </div>
+      </div>
+    </div>
+  );
+
+
+  // --- RENDER ---
   return (
     <div className="wishlist-scroll-content">
+      {isFullscreenPreviewOpen && activeWishlist && (
+          <FullscreenSharePreview wishlist={activeWishlist} />
+      )}
+
       <div className="scroll-header">
         <h3 className="h2">{t('wishlists.title')}</h3>
       </div>
@@ -161,10 +239,12 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                   !isMobile && index === currentIndex ? 'focused' : ''
                 }`}
                 style={{
-                  backgroundImage: `url(${wishlist.imageUrl})`,
+                  backgroundImage: `image-set(url(${wishlist.imageUrl}) 1x, url(${wishlist.imageUrl}) 2x)`,
+                  WebkitBackgroundImage: `-webkit-image-set(url(${wishlist.imageUrl}) 1x, url(${wishlist.imageUrl}) 2x)`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  backgroundRepeat: 'no-repeat'
+                  backgroundRepeat: 'no-repeat',
+                  imageRendering: 'auto',
                 }}
                 onClick={() => {
                   navigate(`/wishlist/${wishlist.id}`);
@@ -178,18 +258,15 @@ const WishListScrollContent = ({ wishlists = [], onSelectWishlist, onCreateWishl
                     <h3 className="wishlist-title-scroll">{wishlist.title}</h3>
                   </div>
                 </div>
-                <div className="card-footer">
+                {/* <div className="card-footer">
                     <button
                       className="share-icon"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onShareWishlist && onShareWishlist(wishlist);
-                      }}
+                      onClick={(e) => handleShareClick(e, wishlist)} // Use the new handler
                       aria-label={`Share ${wishlist.title} wishlist`}
                     >
-                      <Icon name="share" size={24} />
+                      <Icon name="instagram" size={36} />
                     </button>
-                  </div>
+                  </div> */}
               </div>
             ))}
           </div>

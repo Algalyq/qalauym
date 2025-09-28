@@ -79,15 +79,43 @@ export const wishlistService = {
     }
   },
 
+
+  updateWish: async (wishData, token) => {
+    try {
+      const response = await api.patch(`/wishes/${wishData.id}`, wishData, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Update wish error:', error);
+      throw error;
+    }
+  },
+
+  deleteWish: async (wishId, token) => {
+    try {
+      const response = await api.delete(`/wishes/${wishId}/fulfill`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Delete wish error:', error);
+      throw error;
+    }
+  },
+
   updateWishlistImage: async (wishlistId, imageUrl, token) => {
     try {
       const response = await api.patch(`/wishlists/image`, {
-        wishlistId,
-        imageUrl
+        id:wishlistId,
+        imageUrl: imageUrl
       }, {
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Authorization': `Bearer ${token}`
         }
       });
       return response.data;

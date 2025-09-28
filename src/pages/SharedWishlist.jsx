@@ -1,142 +1,213 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { wishlistService } from '../services/wishlistService';
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-import { MdArrowBack } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
+// NOTE: Removed useAuth as this is a public/shared view
+import wishlistService from '../services/wishlistService';
+// NOTE: Removed unused imports related to editing/uploading
+import { MdClose } from 'react-icons/md'; 
+import '../styles/dashboard/wishlist-details.css';
+import '../styles/common/loading.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import Icon from '../components/common/Icon/Icon';
+import SharedWishDetailModal from '../components/modals/SharedWishDetailModal';
 
 const SharedWishlist = () => {
-  const { id } = useParams();
+  const { t } = useTranslation();
+  const { id } = useParams(); // id is the wishlistId
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  
   const [wishlist, setWishlist] = useState(null);
   const [wishes, setWishes] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showRetry, setShowRetry] = useState(false);
+  const [selectedWishId, setSelectedWishId] = useState(null);
+  const [isWishModalOpen, setIsWishModalOpen] = useState(false);
+  
+  // --- WISH FETCHING LOGIC (Using public service method from old code) ---
 
-  useEffect(() => {
-    const loadSharedWishlist = async () => {
-      try {
-        setLoading(true);
-        const response = await wishlistService.getSharedWishlist(id);
-        console.log("Shared wishlist response:", response.data);
-        if (response.data) {
-          setWishlist(response.data.wishlist);
-          setWishes(response.data.wishes);
-        } else {
-          setError('Unable to load wishlist');
-        }
-      } catch (err) {
-        console.error('Error loading shared wishlist:', err);
-        setError('This wishlist is not available or has been set to private');
-      } finally {
-        setLoading(false);
+  const fetchWishlistData = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Use the service method designed for public access (no token required)
+      // Assuming wishlistService.getSharedWishlist(id) exists and returns { wishlist, wishes }
+      const response = await wishlistService.getSharedWishlist(id);
+      
+      if (response && response.data) {
+        // Assume the response structure is { data: { wishlist: {..}, wishes: [..] } }
+        setWishlist(response.data.wishlist || {});
+        setWishes(response.data.wishes || []);
+      } else {
+         setError(t('wishlist.failedToLoadWishlist') || 'Failed to load this shared wishlist.');
       }
-    };
+      
+    } catch (err) {
+      console.error('Error fetching shared wishlist data:', err);
+      setError(t('wishlist.notAvailablePublic') || 'This wishlist is not available or has been set to private.');
+    } finally {
+      setIsLoading(false);
+      setShowRetry(false); 
+    }
+  }, [id, t]);
 
-    loadSharedWishlist();
-  }, [id]);
+  // Call the fetch function on component mount/ID change
+  useEffect(() => {
+    fetchWishlistData();
+  }, [fetchWishlistData]); 
 
-  if (loading) {
+  // --- HANDLERS (Read-Only) ---
+  
+  // Removed handleAddWish
+  // Removed handleShareWishlist
+  // Removed handleWishDeletedAndRefresh
+
+  const handleGoBack = () => {
+    // Navigate to the app's root/landing page for shared view
+    navigate('/'); 
+  };
+
+  const handleWishClick = (wishId) => {
+    setSelectedWishId(wishId);
+    setIsWishModalOpen(true);
+  };
+
+  const closeWishModal = () => {
+    setIsWishModalOpen(false);
+    setTimeout(() => setSelectedWishId(null), 300);
+  };
+  
+  // Add useEffect to show retry button after 2 seconds of loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        setShowRetry(true);
+      }
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, [isLoading]);
+  
+  const handleRetry = () => {
+    fetchWishlistData(); // Call the fetch function again
+  };
+  
+  // --- CONDITIONAL RENDERING (Using design component's structure) ---
+
+  if (isLoading && !wishlist) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background">
-        <AiOutlineLoading3Quarters className="animate-spin text-primary w-12 h-12 mb-4" />
-        <p className="text-gray-600">Loading wishlist...</p>
+      <div className="loading-container">
+        <div className="spinner"></div>
+        <p className="loading-text">{t('wishlist.loading')}</p>
+        {showRetry && (
+          <button onClick={handleRetry} className="retry-button">
+            {t('wishlist.retry')}
+          </button>
+        )}
       </div>
     );
   }
-
+  
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
-        <div className="bg-white rounded-lg shadow-md p-8 max-w-md w-full">
-          <h2 className="text-2xl font-bold text-center mb-4 text-error">Wishlist Unavailable</h2>
-          <p className="text-gray-600 text-center mb-6">{error}</p>
-          <div className="flex justify-center">
-            <button
-              onClick={() => navigate('/')}
-              className="px-6 py-2 bg-primary text-white rounded-md hover:bg-primary-dark transition-all flex items-center"
-            >
-              <MdArrowBack className="mr-2" /> Go Home
-            </button>
-          </div>
-        </div>
+      <div className="error-container">
+        <div className="error-icon">⚠️</div>
+        <p className="error-message">{error}</p>
+        <button onClick={handleGoBack} className="btn-primary">
+          {t('wishlist.backToHome') || 'Go to Home'}
+        </button>
+      </div>
+    );
+  }
+  
+  if (!wishlist) {
+    return (
+      <div className="not-found-container">
+        <p>{t('wishlist.notFound')}</p>
+        <button onClick={handleGoBack} className="btn-primary">
+          {t('wishlist.backToHome') || 'Go to Home'}
+        </button>
       </div>
     );
   }
 
+  // --- RENDER (Using design component's JSX structure) ---
   return (
-    <div className="min-h-screen bg-background py-8 px-4">
-      <div className="max-w-5xl mx-auto">
-        {/* Header with basic navigation */}
-        <div className="mb-6 flex justify-between items-center">
-          <button 
-            onClick={() => navigate('/')} 
-            className="flex items-center text-primary hover:underline"
-          >
-            <MdArrowBack className="mr-1" /> Home
-          </button>
+    <div className="wishlist-details-container shared-view">
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss={false}
+        draggable
+        pauseOnHover
+      />
+      <header className="dashboard-header">
+        <div className="header-container">
+          <h3 className="body1">{wishlist.title}</h3>
         </div>
-
-        {/* Wishlist header */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-            <div>
-              <h1 className="text-2xl md:text-3xl font-bold mb-2">{wishlist?.title}</h1>
-              <p className="text-gray-600">
-                <span className="bg-primary bg-opacity-10 text-primary px-2 py-1 rounded-md text-sm font-medium">
-                  Shared Wishlist
-                </span>
-              </p>
+      </header>
+      
+      <main className="wishes-container">
+        {wishlist?.description && (
+            <div className="shared-description-box">
+                <p className="subbody2 text-center text-gray-600">
+                    {wishlist.description}
+                </p>
             </div>
-          </div>
-          {wishlist?.description && (
-            <p className="text-gray-600 mb-4">{wishlist.description}</p>
-          )}
-        </div>
+        )}
 
-        {/* Wishes/Gifts Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="wishes-grid">
+          {/* Removed Add New Wish Card */}
+          
+          {/* Display Wishes */}
           {wishes.length > 0 ? (
             wishes.map((wish) => (
-              <div key={wish.id} className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
-                {wish.imageUrl && (
-                  <div className="h-48 overflow-hidden">
-                    <img
-                      src={wish.imageUrl}
-                      alt={wish.name}
-                      className="w-full h-full object-cover"
+              <div key={wish.id} className="wish-item" onClick={() => handleWishClick(wish.id)}>
+                <div className="wish-card">
+                  {wish.imageUrl ? (
+                    <div 
+                      className="wish-image" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        backgroundImage: `url(${wish.imageUrl})`, 
+                        backgroundSize: 'cover', 
+                        backgroundPosition: 'center' 
+                      }}
                     />
-                  </div>
-                )}
-                <div className="p-4 flex-grow">
-                  <h3 className="font-bold text-lg mb-2">{wish.name}</h3>
-                  {wish.description && (
-                    <p className="text-gray-600 text-sm mb-3">{wish.description}</p>
+                  ) : (
+                    <div className="wish-image placeholder-image">
+                      <Icon name="gift" size={32} />
+                    </div>
                   )}
-                  {wish.link && (
-                    <a
-                      href={wish.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-primary hover:underline text-sm block mb-3"
-                    >
-                      View Gift Link
-                    </a>
-                  )}
-                  {wish.price && (
-                    <p className="text-gray-800 font-medium">
-                      Price: {wish.price}
-                    </p>
-                  )}
+                </div>
+                <div className="subbody3">
+                  {wish.title}
                 </div>
               </div>
             ))
           ) : (
             <div className="col-span-full text-center py-10">
-              <p className="text-gray-500 text-lg">This wishlist has no gifts yet.</p>
+              <p className="text-gray-500 text-lg">
+                {t('wishlist.noWishesShared') || 'This wishlist is currently empty.'}
+              </p>
             </div>
           )}
         </div>
-      </div>
+      </main>
+
+      {/* Wish Detail Modal */}
+      <SharedWishDetailModal 
+        wishData={wishes.find(wish => wish.id === selectedWishId)}
+        isOpen={isWishModalOpen}
+        onClose={closeWishModal}
+      />
     </div>
   );
 };

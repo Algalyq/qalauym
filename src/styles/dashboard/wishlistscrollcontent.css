@@ -136,6 +136,8 @@
   align-items: center;
   justify-content: center;
   color: #2E4454;
+  background-color: #fff;
+  border-radius: 4px;
   transition: all 0.3s ease;
   cursor: pointer;
   outline: none;
@@ -149,20 +151,22 @@
 }
   
 .card-body {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  width: 100%;
+  background-color: #fff;
+  border-radius: 4px;
+  /* --- ДОБАВЛЕНО ДЛЯ ВЕРТИКАЛЬНОГО ЦЕНТРИРОВАНИЯ --- */
+  display: flex; /* Активируем Flexbox */
+  align-items: center; /* Центрируем элементы по вертикальной оси */
+  justify-content: center; /* (Опционально) Центрируем элементы по горизонтальной оси */
+  /* height: 100%; Убедитесь, что div занимает всю необходимую высоту */
+  /* --- КОНЕЦ ДОБАВЛЕНИЯ --- */
 }
 
 .wishlist-title-scroll {
+  /* ... Ваш существующий стиль ... */
   font-size: 24px;
   font-weight: 700;
-  color: #2d3748;
-  margin: 0 0 16px 0;
+  color: #000;
+  margin: 0; /* Удаление внешних отступов h3, так как они могут сбить центрирование */
   text-transform: uppercase;
   letter-spacing: 1px;
   line-height: 1.2;
@@ -286,7 +290,7 @@
   
   .wishlist-title-scroll {
     font-size: 18px;
-    margin-bottom: 12px;
+    padding: 4px;
   }
   
   .item-count {
@@ -447,4 +451,93 @@
   .create-wishlist-btn-scroll {
     border: 2px solid #000;
   }
+}
+
+/* --- Fullscreen Share Preview Styles --- */
+
+.fullscreen-share-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-background); /* Use your background color */
+  z-index: 1000; /* Ensure it's on top of everything */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.fullscreen-preview-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-color: var(--color-white); /* Adjust as needed */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.preview-close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 5px;
+}
+
+.preview-title {
+  /* Corresponds to h2 or a large title style */
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: var(--color-text-primary);
+  text-align: center;
+  flex-grow: 1; /* Allows title to take up space */
+}
+
+.preview-share-btn {
+  /* Style for the final share button */
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 15px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.preview-content-container {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow: hidden; /* Important for clean look */
+}
+
+/* Styles for the card in fullscreen mode */
+.fullscreen-card {
+  /* Make the card large and centered */
+  width: 85vw; /* Example large size */
+  max-width: 400px;
+  height: 60vh; /* Example height */
+  max-height: 500px;
+  transform: none !important; /* Remove any scaling/rotation from the carousel */
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure card content visibility in the fullscreen context */
+.fullscreen-card .card-content {
+  /* Ensure title is visible for sharing */
+  background: rgba(0, 0, 0, 0.3); /* Add background for readability */
+  color: var(--color-white);
+}
+
+.fullscreen-card .card-footer {
+  display: none; /* Hide the share button inside the preview card */
+}
+
+/* Additional style to ensure the title is white/readable in fullscreen card */
+.fullscreen-card .wishlist-title-scroll {
+  color: var(--color-white); 
 }

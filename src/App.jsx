@@ -89,6 +89,13 @@ function AppContent() {
             <AddWishes />
           </ProtectedRoute>
         } />
+
+        <Route path="/wishlist/:id/edit-wish/:wishToEditId" element={
+          <ProtectedRoute>
+            <AddWishes />
+          </ProtectedRoute>
+        } />
+
         <Route path="/profile" element={
           <ProtectedRoute>
             <Profile />
