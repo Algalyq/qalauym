@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import WishlistDetails from './pages/WishlistDetails';
 import SharedWishlist from './pages/SharedWishlist';
 import AddWishes from './pages/AddWishes';
+import InfoPage from './pages/InfoPage';
 import OAuthCallback from './pages/OAuthCallback';
 import Profile from './pages/Profile';
 import { isTokenExpired } from './utils/authUtils';
@@ -73,6 +74,7 @@ function AppContent() {
   return (
     <div className="min-h-screen">
       <Routes>
+        <Route path="/info" element={<InfoPage />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/dashboard" element={
           <ProtectedRoute>
