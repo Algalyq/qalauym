@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import '../../../styles/common/buttons.css';
 import '../../../styles/common/typography.css';
 
-const CreateWishlistModal = ({
+const CreateWishlistModal = memo(({
   isOpen,
   onClose,
   newWishlist,
@@ -12,38 +12,42 @@ const CreateWishlistModal = ({
 }) => {
   const { t } = useTranslation();
 
-  if (!isOpen) return null;
+  // Memoized translations
+  const translations = useMemo(() => ({
+    createNewWishlist: t('dashboard.createNewWishlist'),
+    wishlistTitlePlaceholder: t('dashboard.wishlistTitlePlaceholder'),
+    wishlistDescriptionPlaceholder: t('dashboard.wishlistDescriptionPlaceholder'),
+    public: t('dashboard.public'),
+    private: t('dashboard.private'),
+    creating: t('common.creating'),
+    cancel: t('common.cancel')
+  }), [t]);
 
-  const handleSubmit = (e) => {
+  // Memoized handlers
+  const handleSubmit = useCallback((e) => {
     e.preventDefault();
-    // Call the onSubmit handler with the current newWishlist data
-    console.log('Submitting form with data:', newWishlist);
     onSubmit(newWishlist);
-  };
-  
-  const handleInputChange = (e) => {
+  }, [onSubmit, newWishlist]);
+
+  const handleFormChange = useCallback((e) => {
     const { name, value } = e.target;
-    onInputChange({
-      target: {
-        name,
-        value
-      }
-    });
-  };
+    onInputChange({ target: { name, value } });
+  }, [onInputChange]);
+
+  if (!isOpen) return null;
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <h2 className="subtitle1">{t('dashboard.createNewWishlist')}</h2>
+        <h2 className="subtitle1">{translations.createNewWishlist}</h2>
         
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onChange={handleFormChange}>
           <div className="form-group">
             <input
               type="text"
               name="title"
               value={newWishlist.title || ''}
-              onChange={handleInputChange}
-              placeholder={t('dashboard.wishlistTitlePlaceholder')}
+              placeholder={translations.wishlistTitlePlaceholder}
               className="form-input"
               required
             />
@@ -53,8 +57,7 @@ const CreateWishlistModal = ({
             <textarea
               name="description"
               value={newWishlist.description || ''}
-              onChange={handleInputChange}
-              placeholder={t('dashboard.wishlistDescriptionPlaceholder')}
+              placeholder={translations.wishlistDescriptionPlaceholder}
               className="form-textarea"
               rows="3"
             />
@@ -64,30 +67,31 @@ const CreateWishlistModal = ({
             <select
               name="visibility"
               value={newWishlist.visibility || 'PUBLIC'}
-              onChange={handleInputChange}
               className="form-select"
             >
-              <option value="PUBLIC">{t('dashboard.public')}</option>
-              <option value="PRIVATE">{t('dashboard.private')}</option>
+              <option value="PUBLIC">{translations.public}</option>
+              <option value="PRIVATE">{translations.private}</option>
             </select>
           </div>
           
           <div className="form-actions">
             <button type="submit" className="btn-primary">
-              {t('common.creating')}
+              {translations.creating}
             </button>
             <button 
               type="button" 
               onClick={onClose}
               className="btn-secondary"
             >
-              {t('common.cancel')}
+              {translations.cancel}
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-};
+});
+
+CreateWishlistModal.displayName = 'CreateWishlistModal';
 
 export default CreateWishlistModal;

@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { MdArrowBack, MdClose } from 'react-icons/md';
+import { MdClose } from 'react-icons/md';
 import { uploadImage } from '../services/s3service';
 import wishlistService from '../services/wishlistService';
 import Icon from '../components/common/Icon/Icon';
@@ -12,157 +12,183 @@ import 'react-toastify/dist/ReactToastify.css';
 import addWishes from '../assets/icons/add_img_wishes.svg';
 import collageService from '../services/collageService';
 
-// Renaming the component to reflect its dual purpose
+// Memoized file validation function
+const validateFile = (file, t) => {
+  if (!file.type.startsWith('image/')) {
+    toast.error(t('wishlist.invalidImageType') || 'Please select a valid image file');
+    return false;
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    toast.error(t('wishlist.imageTooLarge') || 'Image size should be less than 5MB');
+    return false;
+  }
+
+  return true;
+};
+
+// Memoized image upload handler
+const useImageUpload = (t) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const uploadWishImage = useCallback(async (file, onSuccess) => {
+    if (!validateFile(file, t)) return false;
+
+    setIsUploading(true);
+    try {
+      const result = await uploadImage({ file }, 'wish');
+      onSuccess(result.url);
+      return true;
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error(t('wishlist.uploadError') || 'Failed to upload image');
+      return false;
+    } finally {
+      setIsUploading(false);
+    }
+  }, [t]);
+
+  return { isUploading, uploadWishImage };
+};
+
 const AddEditWish = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  // id is the wishlistId
-  // wishToEditId is the new parameter for the wish being edited (optional)
   const { id, wishToEditId } = useParams(); 
   const fileInputRef = useRef(null);
 
-  // Determine the mode
   const isEditMode = !!wishToEditId;
 
+  // Optimized state management
   const [wish, setWish] = useState({
     wishListId: id,
     title: '',
     price: '',
     url: '',
     description: '',
-    imageUrl: '' // Initialize imageUrl
+    imageUrl: ''
   });
   
-  const [selectedImage, setSelectedImage] = useState(null);
   const [selectedImageURL, setSelectedImageURL] = useState('');
-  const [isUploading, setIsUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [wishlistTitle, setWishlistTitle] = useState('');
 
-  // --- EFFECT: Fetch Wishlist Title & Existing Wish Details ---
+  const { isUploading, uploadWishImage } = useImageUpload(t);
+
+  // Memoized translations
+  const translations = useMemo(() => ({
+    headerTitle: isEditMode ? 
+      t('wishlists.editGift') : 
+      t('wishlists.addNewGift'),
+    buttonText: isEditMode ? 
+      t('wishlists.saveChanges') : 
+      t('wishlists.addGift'),
+    submittingText: isEditMode ?
+      t('wishlists.saving') :
+      t('wishlists.adding')
+  }), [isEditMode, t]);
+
+  // Optimized data fetching
   useEffect(() => {
     const token = localStorage.getItem('token');
-    
-    // 1. Fetch Wishlist Metadata (Title)
-    const fetchWishlistMetadata = async () => {
+    if (!id) return;
+
+    const fetchData = async () => {
       try {
-        const response = await wishlistService.getWishlistMetadata(id, token);
-        if (response?.data?.title) {
-          setWishlistTitle(response.data.title);
+        // Fetch wishlist metadata
+        const [metadataResponse, wishResponse] = await Promise.all([
+          wishlistService.getWishlistMetadata(id, token),
+          isEditMode ? wishlistService.getWishDetail(wishToEditId, token) : Promise.resolve(null)
+        ]);
+
+        if (metadataResponse?.data?.title) {
+          setWishlistTitle(metadataResponse.data.title);
+        }
+
+        if (isEditMode && wishResponse?.data) {
+          const existingWish = wishResponse.data;
+          setWish({
+            wishListId: existingWish.wishListId,
+            title: existingWish.title || '',
+            price: existingWish.price || '',
+            url: existingWish.url || '',
+            description: existingWish.description || '',
+            imageUrl: existingWish.imageUrl || ''
+          });
+          
+          if (existingWish.imageUrl) {
+            setSelectedImageURL(existingWish.imageUrl);
+          }
         }
       } catch (error) {
-        console.error('Error fetching wishlist metadata:', error);
-      }
-    };
-
-    // 2. Fetch Wish Details if in Edit Mode
-    const fetchWishDetail = async () => {
-        try {
-            const response = await wishlistService.getWishDetail(wishToEditId, token);
-            const existingWish = response?.data;
-            
-            if (existingWish) {
-                // Populate the state with existing data
-                setWish({
-                    wishListId: existingWish.wishListId,
-                    title: existingWish.title || '',
-                    price: existingWish.price || '',
-                    url: existingWish.url || '',
-                    description: existingWish.description || '',
-                    imageUrl: existingWish.imageUrl || '' // Use existing image URL
-                });
-                if (existingWish.imageUrl) {
-                    // Set the image URL for preview without a new file object
-                    setSelectedImageURL(existingWish.imageUrl);
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching wish detail for edit:', error);
-            toast.error(t('wishlist.loadWishError') || 'Failed to load wish details for editing.');
+        console.error('Error fetching data:', error);
+        if (isEditMode) {
+          toast.error(t('wishlist.loadWishError') || 'Failed to load wish details for editing.');
         }
+      }
     };
 
-    if (id) {
-      fetchWishlistMetadata();
-      if (isEditMode) {
-        fetchWishDetail();
-      }
-    }
-  }, [id, wishToEditId, isEditMode, t]); // Added dependencies
+    fetchData();
+  }, [id, wishToEditId, isEditMode, t]);
 
-  // --- HANDLERS ---
-  
-  const handleInputChange = (e) => {
+  // Optimized handlers with useCallback
+  const handleInputChange = useCallback((e) => {
     const { name, value } = e.target;
     setWish(prev => ({
       ...prev,
       [name]: value
     }));
-  };
+  }, []);
 
-  const handleImageChange = async (e) => {
+  const handleImageChange = useCallback(async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error(t('wishlist.invalidImageType') || 'Please select a valid image file');
-      return;
+    // Create preview immediately
+    const objectUrl = URL.createObjectURL(file);
+    setSelectedImageURL(objectUrl);
+
+    // Upload image
+    const success = await uploadWishImage(file, (imageUrl) => {
+      setWish(prev => ({ ...prev, imageUrl }));
+    });
+
+    if (!success) {
+      setSelectedImageURL(wish.imageUrl || '');
+      URL.revokeObjectURL(objectUrl); // Clean up blob URL
     }
+  }, [uploadWishImage, wish.imageUrl]);
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error(t('wishlist.imageTooLarge') || 'Image size should be less than 5MB');
-      return;
-    }
-
-    setSelectedImage(file);
-    // Use the local URL for instant preview
-    setSelectedImageURL(URL.createObjectURL(file)); 
-    setIsUploading(true);
-
-    try {
-      // NOTE: Uploading immediately is fine, but for an edit, you might
-      // consider only uploading on final submit to avoid orphaned files if
-      // the user cancels the edit. Keeping the original logic for simplicity.
-      const result = await uploadImage({ file }, 'wish');
-      setWish(prev => ({
-        ...prev,
-        imageUrl: result.url // Store the S3 URL
-      }));
-
-      setIsUploading(false);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast.error(t('wishlist.uploadError') || 'Failed to upload image');
-      setIsUploading(false);
-      setSelectedImage(null);
-      setSelectedImageURL(wish.imageUrl || ''); // Revert to old URL if it exists
-    }
-  };
-
-  const removeImage = () => {
-    setSelectedImage(null);
+  const removeImage = useCallback(() => {
     setSelectedImageURL('');
-    setWish(prev => ({
-      ...prev,
-      imageUrl: '' // Clear the image URL
-    }));
+    setWish(prev => ({ ...prev, imageUrl: '' }));
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
+  }, []);
 
-  const triggerFileInput = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
+  const triggerFileInput = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
-  const handleGoBack = () => {
+  const handleGoBack = useCallback(() => {
     navigate(`/wishlist/${id}`);
-  };
+  }, [navigate, id]);
 
-  const handleSubmit = async (e) => {
+  // Alternative collage generation methods
+  const generateCollageOptimized = useCallback(async (wishlistId, token) => {
+    try {
+      // Use low priority instead of async to ensure it starts properly
+      await collageService.generateCollageLowPriority(wishlistId, token);
+    } catch (error) {
+      console.warn('Collage generation failed:', error);
+      // Don't throw - collage failure shouldn't block wish creation
+    }
+  }, []);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
+    
     if (!wish.title.trim()) {
       toast.error(t('wishlist.titleRequired') || 'Title is required');
       return;
@@ -172,46 +198,71 @@ const AddEditWish = () => {
       setIsSubmitting(true);
       const token = localStorage.getItem('token');
       
-      let successMessage;
-
       if (isEditMode) {
-        // --- EDIT MODE LOGIC ---
-        const payload = { ...wish, id: wishToEditId }; // Include the wish ID for the update API
-        await wishlistService.updateWish(payload, token);
-        successMessage = t('wishlist.wishUpdatedSuccess') || 'Wish updated successfully';
-
+        await wishlistService.updateWish({ ...wish, id: wishToEditId }, token);
+        toast.success(t('wishlist.wishUpdatedSuccess') || 'Wish updated successfully');
+        
+        // Regenerate collage for edit mode too, in case images changed
+        setTimeout(() => {
+          collageService.generateCollageAsync(wish.wishListId, token)
+            .catch(console.error);
+        }, 100);
       } else {
-        // --- CREATE MODE LOGIC ---
-        // Payload already contains wishListId
+        // First add the wish
         await wishlistService.addWishToWishlist(wish, token);
-        successMessage = t('wishlist.wishAddedSuccess') || 'Wish added successfully';
-
-        await collageService.generateAndUpdateCollage(wish.wishListId, token);
+        toast.success(t('wishlist.wishAddedSuccess') || 'Wish added successfully');
+        
+        // Use a short delay to ensure wish is saved before generating collage
+        setTimeout(() => {
+          collageService.generateCollageAsync(wish.wishListId, token)
+            .catch(console.error);
+        }, 100);
       }
+      
+      // Navigate immediately without waiting for collage
       navigate(`/wishlist/${wish.wishListId}`);
     } catch (error) {
       console.error('Error submitting wish:', error);
       const errorMessage = isEditMode ? 
-        (t('wishlist.wishUpdateError') || 'Failed to update wish') : 
-        (t('wishlist.wishAddError') || 'Failed to add wish');
+        t('wishlist.wishUpdateError') : 
+        t('wishlist.wishAddError');
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [wish, isEditMode, wishToEditId, t, navigate, generateCollageOptimized]);
 
-  // --- RENDER LOGIC ---
-  const headerTitle = isEditMode ? 
-    (t('wishlists.editGift') || 'Өтінімді өзгерту') : 
-    (t('wishlists.addNewGift') || 'Жаңа сыйлық қосу');
-    
-  const buttonText = isEditMode ? 
-    (t('wishlists.saveChanges') || 'Сақтау') : 
-    (t('wishlists.addGift') || 'Қалауды қосу');
+  // Memoized form fields to prevent unnecessary re-renders
+  const formFields = useMemo(() => [
+    {
+      id: 'title',
+      name: 'title',
+      type: 'text',
+      label: t('wishlist.giftTitle'),
+      placeholder: 'Apple watch',
+      required: true
+    },
+    {
+      id: 'price',
+      name: 'price',
+      type: 'text',
+      label: t('wishlist.price'),
+      placeholder: '120.000 - 150.000',
+      required: false
+    },
+    {
+      id: 'url',
+      name: 'url',
+      type: 'url',
+      label: t('wishlist.url'),
+      placeholder: t('wishlist.urlPlaceholder'),
+      required: false
+    }
+  ], [t]);
 
-  const submittingText = isEditMode ?
-    (t('wishlists.saving') || 'Сақталуда...') :
-    (t('wishlists.adding') || 'Қалауды қосу...');
+  if (!id) {
+    return <div>Error: Wishlist ID is required</div>;
+  }
 
   return (
     <div className="wishlist-details-container">
@@ -226,23 +277,18 @@ const AddEditWish = () => {
         draggable
         pauseOnHover
       />
+      
       <header className="wishlist-header-wishes">
         <div className="back-button" onClick={handleGoBack}>
           <Icon name="back" size={18} />
         </div>
-        <h1>{headerTitle}</h1> {/* Dynamic Header Title */}
+        <h1>{translations.headerTitle}</h1>
       </header>
 
       <main className="add-wish-form">
-        <div className="wish-title">{wishlistTitle}</div> {/* Renamed from wishTitle to wishlistTitle */}
+        <div className="wish-title">{wishlistTitle}</div>
         
         <div className="wish-image-section">
-          {/* ... (Your existing image upload UI logic remains here) ... */}
-          
-          {/* This conditional rendering needs fixing based on your intent. 
-              The original code was confusingly placing a second upload button 
-              when an image was *already* selected. I'll keep the original 
-              structure but note this is often simplified. */}
           {selectedImageURL && (
             <div className="additional-image-slot">
               <button
@@ -292,54 +338,23 @@ const AddEditWish = () => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="form-field">
-            <label htmlFor="title">
-              {t('wishlist.giftTitle')}
-            </label>
-            <input
-              type="text"
-              id="title"
-              name="title"
-              placeholder="Apple watch"
-              value={wish.title}
-              onChange={handleInputChange}
-              required
-            />
-          </div>
-
-          {/* ... (Other form fields: price, url, description) ... */}
-          <div className="form-field">
-            <label htmlFor="price">
-              {t('wishlist.price')}
-            </label>
-            <input
-              type="text"
-              id="price"
-              name="price"
-              placeholder="120.000 - 150.000"
-              value={wish.price}
-              onChange={handleInputChange}
-            />
-          </div>
+          {formFields.map(field => (
+            <div key={field.id} className="form-field">
+              <label htmlFor={field.id}>{field.label}</label>
+              <input
+                type={field.type}
+                id={field.id}
+                name={field.name}
+                placeholder={field.placeholder}
+                value={wish[field.name]}
+                onChange={handleInputChange}
+                required={field.required}
+              />
+            </div>
+          ))}
 
           <div className="form-field">
-            <label htmlFor="url">
-              {t('wishlist.url')}
-            </label>
-            <input
-              type="url"
-              id="url"
-              name="url"
-              placeholder={t('wishlist.urlPlaceholder')}
-              value={wish.url}
-              onChange={handleInputChange}
-            />
-          </div>
-
-          <div className="form-field">
-            <label htmlFor="description">
-              {t('wishlist.description')}
-            </label>
+            <label htmlFor="description">{t('wishlist.description')}</label>
             <textarea
               id="description"
               name="description"
@@ -349,13 +364,12 @@ const AddEditWish = () => {
             />
           </div>
 
-
           <button 
             type="submit" 
             className="add-wish-btn"
             disabled={isSubmitting || isUploading}
           >
-            {isSubmitting ? submittingText : buttonText} {/* Dynamic Button Text */}
+            {isSubmitting ? translations.submittingText : translations.buttonText}
           </button>
         </form>
       </main>

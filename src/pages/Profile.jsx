@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
+import LanguageSelector from '../components/common/LanguageSelector';
 import userService from '../services/userService';
 import NavBar from '../components/common/NavBar';
 import EditProfileModal from '../components/common/Modals/EditProfileModal';
@@ -60,21 +61,11 @@ const Profile = () => {
 
   return (
     <div className="profilePage">
-      <div className="language-switcher">
-        <button 
-          className={`lang-btn ${i18n.language === 'kz' ? 'active' : ''}`}
-          onClick={() => changeLanguage('kz')}
-        >
-          Қаз
-        </button>
-        <span className="lang-separator">|</span>
-        <button 
-          className={`lang-btn ${i18n.language === 'ru' ? 'active' : ''}`}
-          onClick={() => changeLanguage('ru')}
-        >
-          Рус
-        </button>
-      </div>
+
+
+      <div className="language-switcher"> 
+        <LanguageSelector />
+      </div> 
       <div className="profileContainer">
         <div className="headerBackground">
           <div className="avatarWrapper">
