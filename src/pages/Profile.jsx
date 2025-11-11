@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from 'i18next';
+import { useNavigate } from 'react-router-dom';
 import LanguageSelector from '../components/common/LanguageSelector';
 import userService from '../services/userService';
 import NavBar from '../components/common/NavBar';
@@ -25,6 +26,9 @@ const Profile = () => {
   const [error, setError] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   
+
+  const navigate = useNavigate();
+
   const changeLanguage = (lng) => {
     i18n.changeLanguage(lng);
     // The language will be saved to localStorage automatically by i18next
@@ -59,6 +63,14 @@ const Profile = () => {
   const showTextAvatar = !profile.avatarUrl;
 
 
+  const handleLogout = () => {
+    // Clear all localStorage data
+    localStorage.clear();
+    
+    // Navigate to main/home page
+    navigate('/');
+  };
+
   return (
     <div className="profilePage">
 
@@ -90,6 +102,15 @@ const Profile = () => {
             <button onClick={() => setIsEditModalOpen(true)} className="actionButton">
               {/* Edit Icon SVG */}
               <span>{t('profile.editProfile')}</span>
+            </button>
+            <button onClick={handleLogout} className="actionButton logoutButton">
+              {/* Logout Icon SVG */}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              <span>{t('profile.logout')}</span>
             </button>
           </div>
         </div>

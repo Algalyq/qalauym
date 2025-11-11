@@ -19,6 +19,21 @@
   z-index: 1000;
 }
 
+/* Add to your profile.css */
+
+.logoutButton {
+  background-color: #ef4444 !important; /* Red background */
+  color: white !important;
+}
+
+.logoutButton:hover {
+  background-color: #dc2626 !important; /* Darker red on hover */
+}
+
+.logoutButton svg {
+  margin-right: 4px;
+}
+
 .lang-btn {
   background: none;
   border: none;
